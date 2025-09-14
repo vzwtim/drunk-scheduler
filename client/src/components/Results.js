@@ -65,6 +65,8 @@ function Results({ event, onResponseSubmitted }) {
   }
 
   const numParticipants = event.responses.length;
+  const numFixedColumns = 2; // Date column and Input column
+  const totalColumns = numParticipants + numFixedColumns;
 
   // Calculate attendance summary for each date
   const dateAttendanceCounts = {};
@@ -173,7 +175,7 @@ function Results({ event, onResponseSubmitted }) {
               </tr>
             ))}
             <tr>
-              <td colSpan={sortedDates.length + event.responses.length + 1}> 
+              <td colSpan={totalColumns}> 
                 <button type="submit" className="submit-attendance-button">出欠を登録</button>
               </td>
             </tr>
