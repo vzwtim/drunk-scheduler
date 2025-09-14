@@ -44,6 +44,7 @@ main {
   width: 100%;
   max-width: 1000px; /* Constrain main content width */
   margin-bottom: 30px; /* Adjusted vertical spacing */
+  box-sizing: border-box; /* Ensure padding is included in width */
 }
 
 h2 {
@@ -551,8 +552,10 @@ th, td {
 
 /* Results Table Column Widths */
 .results-container table th:first-child,
-.results-container table td:first-child {
-  width: 140px; /* Fixed width for the date column */
+.results-container table td:first-child,
+.results-container table th:last-child,
+.results-container table td:last-child {
+  width: 140px; /* Fixed width for date and input columns */
 }
 
 .results-container table th,
@@ -564,4 +567,46 @@ th, td {
 
 .table-container {
   overflow-x: auto;
+}
+
+/* Icon Button Styles */
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: 10px;
+  font-size: 1.4em; /* Adjust icon size */
+  color: var(--primary-text-color);
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.icon-button:hover {
+  color: var(--accent-color);
+  transform: scale(1.1);
+}
+
+.icon-button.delete-button {
+  color: #888; /* More subtle color for delete icon */
+}
+
+.icon-button.delete-button:hover {
+  color: #dc3545; /* Red on hover for delete */
+}
+
+/* Subtle Button (for text like 'Unconfirm') */
+.subtle-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 10px;
+  font-size: 0.9em;
+  color: #888;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.subtle-button:hover {
+  color: var(--accent-color);
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { FiEdit, FiTrash2 } from 'react-icons/fi'; // Import icons
 import Results from './Results';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
@@ -144,8 +145,12 @@ function EventPage() {
       <div className="event-header-with-actions"> {/* New container for header and actions */}
         <h1>{event.eventName}</h1>
         <div className="event-actions-top-right"> {/* New div for top-right actions */}
-          <button onClick={() => setIsEditing(true)} className="subtle-button">編集</button>
-          <button onClick={handleDeleteEvent} className="subtle-button delete-button-small">削除</button>
+          <button onClick={() => setIsEditing(true)} className="icon-button" aria-label="編集">
+            <FiEdit />
+          </button>
+          <button onClick={handleDeleteEvent} className="icon-button delete-button" aria-label="削除">
+            <FiTrash2 />
+          </button>
         </div>
       </div>
       {event.description && <p className="event-description">{event.description}</p>}
@@ -153,7 +158,7 @@ function EventPage() {
         ステータス: <span style={{ color: statusColor, fontWeight: 'bold' }}>{eventStatus}</span>
         {event.finalDate && ` (${new Date(event.finalDate).toLocaleDateString()})`}
         {event.finalDate && ( // Show unconfirm button only if date is confirmed
-          <button onClick={handleUnconfirmDate} className="subtle-button unconfirm-button-small">取り消し</button>
+          <button onClick={handleUnconfirmDate} className="subtle-button">取り消し</button>
         )}
       </p>
       {event.lastMinuteWelcome && <p style={{ color: 'var(--sub-accent-color)', fontWeight: 'bold' }}>ドタ参歓迎！</p>}
