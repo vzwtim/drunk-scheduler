@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -35,10 +34,7 @@ connectToMongo();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'client/build')));
-
-// API routes
+// API routes (These must come before static file serving and catch-all)
 
 // 1. Create a new event
 app.post('/api/events', async (req, res) => {
@@ -138,9 +134,11 @@ app.delete('/api/events/:id', async (req, res) => {
   }
 });
 
+// Serve static files from the React app (after API routes)
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 // The "catchall" handler: for any request that doesn't
-// match one of the API routes, send back React's index.html file.
+// match one of the API routes or static files, send back React's index.html file.
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });

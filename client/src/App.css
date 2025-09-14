@@ -1,100 +1,209 @@
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f4f7f6;
-  color: #333;
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: calc(10px + 2vmin);
+  color: var(--primary-text-color);
+  background-color: var(--background-color);
+  padding: 20px;
+}
+
+.App-header {
+  background-color: var(--dark-charcoal);
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: var(--white);
+  width: 100%;
+  max-width: 1200px; /* Constrain header width */
+  margin-bottom: 40px; /* Increased vertical spacing */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.App-header h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 3em; /* Large typography */
+  color: var(--white); /* White text on dark header */
   margin: 0;
-  padding: 20px;
+  padding: 20px 0;
 }
 
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+main {
+  background-color: var(--white);
+  padding: 40px; /* Increased padding */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 800px; /* Constrain main content width */
+  margin-bottom: 40px; /* Increased vertical spacing */
 }
 
-h1, h2 {
-  color: #007bff;
+h2 {
+  font-size: 2.5em; /* Large typography */
+  color: var(--accent-color); /* Deep pink for headings */
+  margin-bottom: 30px; /* Increased vertical spacing */
+  border-bottom: 2px solid var(--sub-accent-color); /* Calm green underline */
+  padding-bottom: 10px;
 }
 
-input[type="text"], input[type="date"] {
-  width: calc(100% - 22px);
-  padding: 10px;
-  margin-bottom: 10px;
+h3 {
+  font-size: 1.8em;
+  color: var(--dark-charcoal);
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+/* Form Styling */
+.event-setup-form .form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.event-setup-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1.1em;
+  color: var(--primary-text-color);
+}
+
+input[type="text"],
+input[type="date"] {
+  width: calc(100% - 24px); /* Adjust for padding and border */
+  padding: 12px; /* Increased padding */
+  margin-bottom: 15px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 8px; /* More rounded corners */
+  font-size: 1em;
+  color: var(--primary-text-color);
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus {
+  border-color: var(--accent-color);
+  outline: none;
 }
 
 button {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 15px;
+  background-color: var(--sub-accent-color); /* Calm green for primary buttons */
+  color: var(--white);
+  padding: 12px 25px; /* Increased padding */
   border: none;
-  border-radius: 4px;
+  border-radius: 8px; /* More rounded corners */
   cursor: pointer;
-  font-size: 16px;
-  margin-right: 10px;
+  font-size: 1.1em;
+  margin-right: 15px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: var(--accent-color); /* Deep pink on hover */
+  transform: translateY(-2px); /* Slight lift effect */
 }
 
-.vote-container {
-  position: relative;
-  /* ボタンがタイトルと重ならないように、少し余白を確保します */
-  padding-top: 15px;
+/* Event List Styling */
+ul {
+  list-style: none;
+  padding: 0;
 }
 
-.edit-button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  /* 他のボタンとの区別のために色を変える例 */
-  background-color: #dc3545;
+.event-list-item {
+  background-color: #f0f0f0; /* Lighter background for cards */
+  margin-bottom: 20px;
+  padding: 25px; /* Increased padding */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: left;
 }
 
-.edit-button:hover {
-  background-color: #c82333;
+.event-list-item:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-.date-inputs button {
-    background-color: #28a745;
+.event-list-item a {
+  text-decoration: none;
+  color: var(--dark-charcoal);
+  font-size: 1.5em; /* Larger text for event names */
+  font-weight: bold;
+  display: block; /* Make the whole card clickable */
 }
 
-.date-inputs button:hover {
-    background-color: #218838;
+.event-list-item a:hover {
+  color: var(--accent-color); /* Accent color on hover */
 }
 
-.table-container {
-  margin-top: 20px;
-  overflow-x: auto;
-}
-
+/* Table Styling */
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate; /* Use separate for rounded corners */
+  border-spacing: 0;
+  margin-top: 20px;
+  border-radius: 10px; /* Rounded corners for table */
+  overflow: hidden; /* Ensures rounded corners are visible */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
+  border: 1px solid #eee; /* Lighter border */
+  padding: 15px; /* Increased padding */
   text-align: center;
+  font-size: 1.1em;
 }
 
 th {
-  background-color: #f2f2f2;
+  background-color: var(--sub-accent-color); /* Calm green for table headers */
+  color: var(--white);
+  font-weight: bold;
 }
 
-.best-date {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #e7f3ff;
-    border-left: 6px solid #0776ee;
+tr:nth-child(even) {
+  background-color: #f9f9f9; /* Zebra striping */
+}
+
+tr:hover {
+  background-color: #f0f0f0; /* Subtle hover for rows */
+}
+
+/* Radio buttons for attendance */
+td label {
+  margin: 0 10px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+td input[type="radio"] {
+  margin-right: 5px;
+  transform: scale(1.2); /* Slightly larger radio buttons */
+  cursor: pointer;
+}
+
+/* Specific button styles */
+.date-inputs button {
+  background-color: var(--accent-color); /* Deep pink for "Add Date" */
+}
+
+.date-inputs button:hover {
+  background-color: var(--dark-charcoal);
+}
+
+/* EventPage toggle buttons */
+.event-page-toggle button {
+  background-color: var(--dark-charcoal);
+  margin: 0 10px 20px 0;
+}
+
+.event-page-toggle button:hover {
+  background-color: var(--accent-color);
 }

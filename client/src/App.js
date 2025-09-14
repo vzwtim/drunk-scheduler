@@ -1,74 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import EventSetup from './components/EventSetup';
-import Vote from './components/Vote';
-import Results from './components/Results';
+import EventList from './components/EventList';
+import EventPage from './components/EventPage'; // Import EventPage
+import './App.css';
 
 function App() {
-  const [event, setEvent] = useState(null);
-
-  // アプリ起動時に既存のイベント情報を取得
-  useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        const response = await fetch('http://localhost:3001/api/events');
-        if (response.ok) {
-          const data = await response.json();
-          setEvent(data);
-        }
-      } catch (error) {
-        // バックエンドがまだ起動していない場合などのエラーは無視
-        console.log('No existing event found.');
-      }
+  // This component will handle navigation after event creation
+  const EventCreationRedirect = () => {
+    const navigate = useNavigate();
+    const handleEventCreated = ({ _id }) => {
+      navigate(`/event/${_id}`);
     };
-    fetchEvent();
-  }, []);
-
-  const handleEventCreated = (eventData) => {
-    setEvent(eventData);
-  };
-
-  const handleVoted = (updatedEventData) => {
-    setEvent(updatedEventData);
-  };
-
-  const handleEdit = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/api/events', {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('サーバーからのエラーレスポンス:', {
-          status: response.status,
-          statusText: response.statusText,
-          body: errorText,
-        });
-        throw new Error(`イベントのリセットに失敗しました。(Status: ${response.status})`);
-      }
-
-      setEvent(null);
-      alert('イベントをリセットしました。');
-
-    } catch (error) {
-      console.error('リセット処理中にエラーが発生しました:', error);
-      alert(error.message);
-    }
+    return <EventSetup onEventCreated={handleEventCreated} />;
   };
 
   return (
-    <div className="container">
-      <h1>飲み会日程調整アプリ</h1>
-      {!event ? (
-        <EventSetup onEventCreated={handleEventCreated} />
-      ) : (
-        <>
-          <Vote event={event} onVoted={handleVoted} onEdit={handleEdit} />
-          <Results event={event} />
-        </>
-      )}
-    </div>
+    <BrowserRouter>
+      <div className="App">
+        <header className="App-header">
+          <h1>Drunk Scheduler</h1>
+        </header>
+        <main>
+          <Routes>
+            <Route path="/" element={<EventList />} />
+            <Route path="/create" element={<EventCreationRedirect />} /> {/* Use EventCreationRedirect */}
+            <Route path="/event/:id" element={<EventPage />} /> {/* Use EventPage */}
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
   );
 }
 

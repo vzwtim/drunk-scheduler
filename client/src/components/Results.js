@@ -1,70 +1,92 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
-function Results({ event }) {
+function Results() { // Removed event prop
+  const { id: eventId } = useParams(); // Get eventId from URL
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // 最適な日程を計算する
-  const calculateBestDate = () => {
-    const scores = {};
-    event.dates.forEach(date => {
-      scores[date] = 0;
-    });
-
-    event.responses.forEach(response => {
-      event.dates.forEach(date => {
-        if (response.attendance[date] === '○') {
-          scores[date] += 2; // ○は2点
-        } else if (response.attendance[date] === '△') {
-          scores[date] += 1; // △は1点
+  useEffect(() => {
+    async function fetchEvent() {
+      try {
+        const response = await fetch(`/api/events/${eventId}`);
+        if (!response.ok) {
+          throw new Error('イベントの取得に失敗しました。');
         }
-      });
-    });
-
-    let bestDate = null;
-    let maxScore = -1;
-
-    for (const date in scores) {
-      if (scores[date] > maxScore) {
-        maxScore = scores[date];
-        bestDate = date;
+        const data = await response.json();
+        setEvent(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     }
-    return bestDate;
-  };
+    fetchEvent();
+  }, [eventId]); // Re-fetch if eventId changes
 
-  const bestDate = calculateBestDate();
+  if (loading) {
+    return <div>結果を読み込み中...</div>;
+  }
+
+  if (error) {
+    return <div>エラー: {error}</div>;
+  }
+
+  if (!event) {
+    return <div>イベントが見つかりません。</div>;
+  }
+
+  // Calculate attendance summary
+  const attendanceSummary = {};
+  event.dates.forEach(date => {
+    attendanceSummary[date] = { '○': 0, '△': 0, '×': 0 };
+  });
+
+  event.responses.forEach(response => {
+    for (const date in response.attendance) {
+      const status = response.attendance[date];
+      if (attendanceSummary[date] && attendanceSummary[date][status] !== undefined) {
+        attendanceSummary[date][status]++;
+      }
+    } 
+  });
 
   return (
-    <div>
-      <h2>3. 出欠状況</h2>
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>名前</th>
-              {event.dates.map(date => (
-                <th key={date}>{date}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {event.responses.map(response => (
-              <tr key={response.name}>
-                <td>{response.name}</td>
-                {event.dates.map(date => (
-                  <td key={date}>{response.attendance[date] || '-'}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {bestDate && (
-        <div className="best-date">
-          <h2>最適日程</h2>
-          <p>最も参加者が多い日程は <strong>{bestDate}</strong> です！</p>
-        </div>
+    <div className="results-container">
+      <h2>{event.eventName} - 結果</h2> {/* Display event name */}
+      <h3>参加者一覧:</h3>
+      {event.responses.length === 0 ? (
+        <p>まだ誰も出欠を登録していません。</p>
+      ) : (
+        <ul>
+          {event.responses.map((response, index) => (
+            <li key={index}>{response.name}</li>
+          ))}
+        </ul>
       )}
+
+      <h3>日程別集計:</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>日程</th>
+            <th>○</th>
+            <th>△</th>
+            <th>×</th>
+          </tr>
+        </thead>
+        <tbody>
+          {event.dates.map(date => (
+            <tr key={date}>
+              <td>{date}</td>
+              <td>{attendanceSummary[date]['○']}</td>
+              <td>{attendanceSummary[date]['△']}</td>
+              <td>{attendanceSummary[date]['×']}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
