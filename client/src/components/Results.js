@@ -97,7 +97,7 @@ function Results({ event, onResponseSubmitted }) {
   const totalColumns = numParticipants + numFixedColumns;
 
   // Calculate the minimum width of the table to ensure horizontal scroll appears correctly
-  const tableMinWidth = 140 + 140 + numParticipants * 70; // 140 for date, 140 for input, 100 for each participant
+  const tableMinWidth = 140 + 140 + numParticipants * 90; // 140 for date, 140 for input, 90 for each participant
 
   // Calculate attendance summary for each date
   const dateAttendanceCounts = {};
