@@ -246,6 +246,40 @@ app.delete('/api/events/:id', async (req, res) => {
   }
 });
 
+// New API Endpoint: Delete a participant's response from an event
+app.delete('/api/events/:eventId/responses', async (req, res) => {
+  const { eventId } = req.params;
+  const { name } = req.body; // Get participant name from request body
+
+  if (!name) {
+    return res.status(400).json({ error: '削除する参加者の名前を提供してください。' });
+  }
+
+  try {
+    const eventObjectId = new ObjectId(eventId);
+
+    // Use $pull to remove the response object that matches the name
+    const result = await db.collection('events').updateOne(
+      { _id: eventObjectId },
+      { $pull: { responses: { name: name } } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'イベントが見つかりません。' });
+    }
+    if (result.modifiedCount === 0) {
+      // This can happen if the participant name doesn't exist
+      return res.status(404).json({ error: '指定された名前の参加者は見つかりません。' });
+    }
+
+    const updatedEvent = await db.collection('events').findOne({ _id: eventObjectId });
+    res.json(updatedEvent);
+  } catch (error) {
+    console.error('Error deleting participant response:', error);
+    res.status(500).json({ error: '参加者の削除に失敗しました。' });
+  }
+});
+
 // Serve static files from the React app (after API routes)
 app.use(express.static(path.join(__dirname, 'client/build')));
 

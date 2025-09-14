@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import { FiTrash2 } from 'react-icons/fi';
 
 function Results({ event, onResponseSubmitted }) {
   const [name, setName] = useState('');
@@ -60,6 +61,33 @@ function Results({ event, onResponseSubmitted }) {
     setAttendance(participantAttendance);
   };
 
+  const handleDeleteParticipant = async (participantName) => {
+    if (!window.confirm(`参加者「${participantName}」を削除しますか？`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/events/${event._id}/responses`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: participantName }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '参加者の削除に失敗しました。');
+      }
+
+      alert(`参加者「${participantName}」を削除しました。`);
+      onResponseSubmitted(); // Refresh the event data
+    } catch (error) {
+      console.error('Error deleting participant:', error);
+      alert(error.message);
+    }
+  };
+
   if (!event) {
     return <div>イベントデータがありません。</div>;
   }
@@ -69,7 +97,7 @@ function Results({ event, onResponseSubmitted }) {
   const totalColumns = numParticipants + numFixedColumns;
 
   // Calculate the minimum width of the table to ensure horizontal scroll appears correctly
-  const tableMinWidth = 140 + 140 + numParticipants * 100; // 140 for date, 140 for input, 100 for each participant
+  const tableMinWidth = 140 + 140 + numParticipants * 70; // 140 for date, 140 for input, 100 for each participant
 
   // Calculate attendance summary for each date
   const dateAttendanceCounts = {};
@@ -123,8 +151,18 @@ function Results({ event, onResponseSubmitted }) {
               <tr>
               <th>日程</th>
               {event.responses.map((response, index) => (
-                <th key={response.name || index} onClick={() => handleParticipantClick(response.name, response.attendance)} className="participant-name-header"> 
-                  {response.name}
+                <th key={response.name || index} className="participant-name-header">
+                  <span className="participant-name" onClick={() => handleParticipantClick(response.name, response.attendance)}>
+                    {response.name}
+                  </span>
+                  <button
+                    type="button"
+                    className="delete-participant-button"
+                    onClick={() => handleDeleteParticipant(response.name)}
+                    aria-label={`参加者 ${response.name} を削除`}
+                  >
+                    <FiTrash2 />
+                  </button>
                 </th>
               ))}
               <th>

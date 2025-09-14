@@ -9,6 +9,8 @@
   color: var(--primary-text-color);
   background-color: var(--background-color);
   padding: 20px;
+  position: relative; /* For positioning the bubbles container */
+  overflow: hidden; /* Hide bubbles that go outside the screen */
 }
 
 .App-header {
@@ -649,4 +651,192 @@ th, td {
 .table-container.no-participants th:last-child,
 .table-container.no-participants td:last-child {
   width: auto;
+}
+
+/* Participant Deletion Styles */
+.participant-name-header {
+  position: relative; /* For positioning the delete button */
+}
+
+.participant-name {
+  cursor: pointer;
+  padding: 5px 20px; /* Add padding to make the hover area larger and prevent overlap */
+  display: inline-block;
+}
+
+.delete-participant-button {
+  display: none; /* Hide by default */
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 1.1em;
+  padding: 5px;
+  line-height: 1;
+}
+
+.participant-name-header:hover .delete-participant-button {
+  display: inline-block; /* Show on hover */
+}
+
+.delete-participant-button:hover {
+  color: #dc3545;
+}
+
+/* Bubble Animation */
+.bubbles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* Place behind content */
+  pointer-events: none; /* Make sure it doesn't interfere with clicks */
+}
+
+.bubble {
+  position: absolute;
+  bottom: -100px; /* Start below the screen */
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  animation: bubble-rise 25s infinite ease-in;
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateX(50px);
+  }
+  100% {
+    transform: translateY(-1080px) translateX(-50px);
+    opacity: 0;
+  }
+}
+
+/* Individual bubble properties for randomness */
+.bubble:nth-child(1) {
+  width: 20px;
+  height: 20px;
+  left: 10%;
+  animation-duration: 15s;
+  animation-delay: 0s;
+}
+
+.bubble:nth-child(2) {
+  width: 25px;
+  height: 25px;
+  left: 20%;
+  animation-duration: 20s;
+  animation-delay: 1s;
+}
+
+.bubble:nth-child(3) {
+  width: 15px;
+  height: 15px;
+  left: 35%;
+  animation-duration: 30s;
+  animation-delay: 2s;
+}
+
+.bubble:nth-child(4) {
+  width: 50px;
+  height: 50px;
+  left: 45%;
+  animation-duration: 18s;
+  animation-delay: 0s;
+}
+
+.bubble:nth-child(5) {
+  width: 35px;
+  height: 35px;
+  left: 55%;
+  animation-duration: 25s;
+  animation-delay: 1s;
+}
+
+.bubble:nth-child(6) {
+  width: 45px;
+  height: 45px;
+  left: 65%;
+  animation-duration: 22s;
+  animation-delay: 3s;
+}
+
+.bubble:nth-child(7) {
+  width: 10px;
+  height: 10px;
+  left: 75%;
+  animation-duration: 35s;
+  animation-delay: 0s;
+}
+
+.bubble:nth-child(8) {
+  width: 60px;
+  height: 60px;
+  left: 85%;
+  animation-duration: 16s;
+  animation-delay: 1s;
+}
+
+.bubble:nth-child(9) {
+  width: 30px;
+  height: 30px;
+  left: 90%;
+  animation-duration: 28s;
+  animation-delay: 2s;
+}
+
+.bubble:nth-child(10) {
+  width: 40px;
+  height: 40px;
+  left: 5%;
+  animation-duration: 19s;
+  animation-delay: 4s;
+}
+
+.bubble:nth-child(11) {
+  width: 22px;
+  height: 22px;
+  left: 15%;
+  animation-duration: 24s;
+  animation-delay: 5s;
+}
+
+.bubble:nth-child(12) {
+  width: 38px;
+  height: 38px;
+  left: 28%;
+  animation-duration: 29s;
+  animation-delay: 6s;
+}
+
+.bubble:nth-child(13) {
+  width: 12px;
+  height: 12px;
+  left: 58%;
+  animation-duration: 32s;
+  animation-delay: 3s;
+}
+
+.bubble:nth-child(14) {
+  width: 55px;
+  height: 55px;
+  left: 78%;
+  animation-duration: 17s;
+  animation-delay: 4s;
+}
+
+.bubble:nth-child(15) {
+  width: 28px;
+  height: 28px;
+  left: 95%;
+  animation-duration: 26s;
+  animation-delay: 5s;
 }
