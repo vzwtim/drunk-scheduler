@@ -46,6 +46,8 @@ function EventList() {
       // Check if finalDate is today or tomorrow
       if (isToday(finalDate) || isTomorrow(finalDate)) {
         todayTomorrowEvents.push(event);
+      } else {
+        upcomingConfirmedEvents.push(event);
       }
     } else {
       schedulingInProgressEvents.push(event);

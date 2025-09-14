@@ -110,9 +110,10 @@ function Results({ event, onResponseSubmitted }) {
 
       {/* Removed <h3>参加者別詳細:</h3> */}
       <form onSubmit={handleSubmit}>
-        <table>
-          <thead>
-            <tr>
+        <div className="table-container"> {/* Wrapper for horizontal scrolling */}
+          <table>
+            <thead>
+              <tr>
               <th>日程</th>
               {event.responses.map((response, index) => (
                 <th key={response.name || index} onClick={() => handleParticipantClick(response.name, response.attendance)} className="participant-name-header"> 
@@ -176,6 +177,7 @@ function Results({ event, onResponseSubmitted }) {
             </tr>
           </tbody>
         </table>
+        </div> {/* Wrapper for horizontal scrolling */}
       </form>
     </div>
   );

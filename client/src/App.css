@@ -138,6 +138,8 @@ ul {
   font-size: 1.2em; /* Adjusted font size */
   font-weight: bold;
   display: block;
+  overflow-wrap: break-word; /* Allow long words to break */
+  white-space: normal; /* Allow text to wrap */
 }
 
 .event-list-item a:hover {
@@ -153,6 +155,7 @@ table {
   border-radius: 8px; /* Slightly smaller border-radius */
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  table-layout: fixed; /* Add this */
 }
 
 th, td {
@@ -538,4 +541,27 @@ th, td {
 .App-header {
   position: relative;
   /* ... existing styles ... */
+}
+
+.event-header-with-actions h1 {
+  overflow-wrap: break-word;
+  white-space: normal;
+  word-break: break-all; /* More aggressive word breaking if needed */
+}
+
+/* Results Table Column Widths */
+.results-container table th:first-child,
+.results-container table td:first-child {
+  width: 140px; /* Fixed width for the date column */
+}
+
+.results-container table th,
+.results-container table td {
+  /* The remaining columns will share the rest of the width equally */
+  overflow-wrap: break-word;
+  word-wrap: break-word; /* For older browsers */
+}
+
+.table-container {
+  overflow-x: auto;
 }
