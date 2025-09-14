@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import TextareaAutosize from 'react-textarea-autosize';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { format } from 'date-fns';
@@ -70,13 +71,13 @@ function EventSetup({ onEventCreated }) {
 
         <div className="form-group">
           <label htmlFor="description">イベント説明:</label>
-          <textarea
+          <TextareaAutosize
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="イベントの詳細や注意事項などを入力してください。"
-            rows="4"
-          ></textarea>
+            minRows={4}
+          />
         </div>
 
         <h3>候補日程の選択</h3>

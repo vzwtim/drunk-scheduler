@@ -64,6 +64,8 @@ function Results({ event, onResponseSubmitted }) {
     return <div>イベントデータがありません。</div>;
   }
 
+  const numParticipants = event.responses.length;
+
   // Calculate attendance summary for each date
   const dateAttendanceCounts = {};
   sortedDates.forEach(date => {
@@ -110,7 +112,7 @@ function Results({ event, onResponseSubmitted }) {
 
       {/* Removed <h3>参加者別詳細:</h3> */}
       <form onSubmit={handleSubmit}>
-        <div className="table-container"> {/* Wrapper for horizontal scrolling */}
+        <div className={`table-container ${numParticipants === 0 ? 'no-participants' : ''}`}> {/* Wrapper for horizontal scrolling */}
           <table>
             <thead>
               <tr>

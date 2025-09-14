@@ -75,6 +75,25 @@ h3 {
   color: var(--primary-text-color);
 }
 
+.event-setup-form textarea {
+  width: calc(100% - 22px); /* Match input, account for border */
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9em;
+  color: var(--primary-text-color);
+  background-color: #fefefe;
+  transition: border-color 0.3s ease;
+  font-family: inherit; /* Ensure font matches the rest of the form */
+  resize: none; /* Disable manual resizing */
+}
+
+.event-setup-form textarea:focus {
+  border-color: var(--accent-color);
+  outline: none;
+}
+
 input[type="text"],
 input[type="date"] {
   width: calc(100% - 20px); /* Adjust for padding and border */
@@ -477,6 +496,7 @@ td input[type="radio"] {
 th, td {
   padding: 8px; /* Reduced padding */
   font-size: 0.9em; /* Slightly smaller font size */
+  vertical-align: middle; /* Add this for vertical alignment */
 }
 
 .name-input-in-table {
@@ -548,6 +568,7 @@ th, td {
   overflow-wrap: break-word;
   white-space: normal;
   word-break: break-all; /* More aggressive word breaking if needed */
+  padding-right: 80px; /* Add space for the absolute positioned icons */
 }
 
 /* Results Table Column Widths */
@@ -609,4 +630,22 @@ th, td {
 
 .subtle-button:hover {
   color: var(--accent-color);
+}
+
+.event-page-container {
+  position: relative; /* For positioning child elements absolutely */
+}
+
+.event-actions-top-right {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  display: flex;
+  gap: 10px;
+}
+
+/* For tables with no participants, let the last column (input) fill the space */
+.table-container.no-participants th:last-child,
+.table-container.no-participants td:last-child {
+  width: auto;
 }
