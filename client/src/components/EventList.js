@@ -6,23 +6,43 @@ function EventList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const response = await fetch('/api/events');
-        if (!response.ok) {
-          throw new Error('イベントの取得に失敗しました。');
-        }
-        const data = await response.json();
-        setEvents(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  const fetchEvents = async () => { // Made fetchEvents a separate function for reusability
+    try {
+      const response = await fetch('/api/events'); // Backend now handles filtering and sorting
+      if (!response.ok) {
+        throw new Error('イベントの取得に失敗しました。');
       }
+      const data = await response.json();
+      setEvents(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchEvents();
   }, []);
+
+  const handleDeleteEvent = async (eventId, eventName) => {
+    if (!window.confirm(`本当にイベント「${eventName}」を削除しますか？この操作は元に戻せません。`)) {
+      return;
+    }
+    try {
+      const response = await fetch(`/api/events/${eventId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('イベントの削除に失敗しました。');
+      }
+      alert(`イベント「${eventName}」を削除しました。`);
+      fetchEvents(); // Re-fetch events after deletion
+    } catch (err) {
+      console.error('Error deleting event:', err);
+      alert(err.message);
+    }
+  };
 
   if (loading) {
     return <div>イベントを読み込み中...</div>;
@@ -40,15 +60,35 @@ function EventList() {
       ) : (
         <ul>
           {events.map(event => (
-            <li key={event._id}>
+            <li key={event._id} className="event-list-item">
               <Link to={`/event/${event._id}`}>
-                {event.eventName} ({event.dates.length}日程)
+                {event.eventName}
+                {event.finalDate ? (
+                  <span style={{ color: 'var(--sub-accent-color)', fontWeight: 'bold', marginLeft: '10px' }}>
+                    日程確定 ({new Date(event.finalDate).toLocaleDateString()})
+                  </span>
+                ) : (
+                  <span style={{ color: 'var(--accent-color)', fontWeight: 'bold', marginLeft: '10px' }}>
+                    日程調整中
+                  </span>
+                )}
+                {event.lastMinuteWelcome && (
+                  <span style={{ color: 'var(--sub-accent-color)', marginLeft: '10px' }}>
+                    (ドタ参歓迎)
+                  </span>
+                )}
               </Link>
+              <button
+                onClick={(e) => { e.preventDefault(); handleDeleteEvent(event._id, event.eventName); }}
+                className="delete-button-list-item"
+              >
+                削除
+              </button>
             </li>
           ))}
         </ul>
       )}
-      <Link to="/create">新しいイベントを作成</Link>
+      <Link to="/create" className="button-link">新しいイベントを作成</Link>
     </div>
   );
 }

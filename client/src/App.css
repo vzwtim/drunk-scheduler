@@ -5,7 +5,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  font-size: calc(10px + 2vmin);
+  font-size: 14px; /* Adjusted base font size for App */
   color: var(--primary-text-color);
   background-color: var(--background-color);
   padding: 20px;
@@ -13,77 +13,77 @@
 
 .App-header {
   background-color: var(--dark-charcoal);
-  min-height: 10vh;
+  min-height: 8vh; /* Slightly reduced height */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: 14px; /* Adjusted base font size */
   color: var(--white);
   width: 100%;
-  max-width: 1200px; /* Constrain header width */
-  margin-bottom: 40px; /* Increased vertical spacing */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 1000px; /* Constrain header width */
+  margin-bottom: 30px; /* Adjusted vertical spacing */
+  border-radius: 8px; /* Slightly smaller border-radius */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Adjusted shadow */
 }
 
 .App-header h1 {
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
-  font-size: 3em; /* Large typography */
-  color: var(--white); /* White text on dark header */
+  font-size: 2.5em; /* Smaller typography */
+  color: var(--white);
   margin: 0;
-  padding: 20px 0;
+  padding: 15px 0; /* Adjusted padding */
 }
 
 main {
   background-color: var(--white);
-  padding: 40px; /* Increased padding */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 30px; /* Adjusted padding */
+  border-radius: 8px; /* Slightly smaller border-radius */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Adjusted shadow */
   width: 100%;
-  max-width: 800px; /* Constrain main content width */
-  margin-bottom: 40px; /* Increased vertical spacing */
+  max-width: 700px; /* Constrain main content width */
+  margin-bottom: 30px; /* Adjusted vertical spacing */
 }
 
 h2 {
-  font-size: 2.5em; /* Large typography */
-  color: var(--accent-color); /* Deep pink for headings */
-  margin-bottom: 30px; /* Increased vertical spacing */
-  border-bottom: 2px solid var(--sub-accent-color); /* Calm green underline */
-  padding-bottom: 10px;
+  font-size: 2em; /* Smaller typography */
+  color: var(--accent-color); /* Amber/Gold for headings */
+  margin-bottom: 20px; /* Adjusted vertical spacing */
+  border-bottom: 1px solid var(--sub-accent-color); /* Green underline */
+  padding-bottom: 8px; /* Adjusted padding */
 }
 
 h3 {
-  font-size: 1.8em;
+  font-size: 1.5em; /* Smaller typography */
   color: var(--dark-charcoal);
-  margin-top: 30px;
-  margin-bottom: 20px;
+  margin-top: 25px;
+  margin-bottom: 15px;
 }
 
 /* Form Styling */
 .event-setup-form .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 15px; /* Adjusted margin */
   text-align: left;
 }
 
 .event-setup-form label {
   display: block;
-  margin-bottom: 8px;
-  font-size: 1.1em;
+  margin-bottom: 6px; /* Adjusted margin */
+  font-size: 1em; /* Adjusted font size */
   color: var(--primary-text-color);
 }
 
 input[type="text"],
 input[type="date"] {
-  width: calc(100% - 24px); /* Adjust for padding and border */
-  padding: 12px; /* Increased padding */
-  margin-bottom: 15px;
+  width: calc(100% - 20px); /* Adjust for padding and border */
+  padding: 10px; /* Adjusted padding */
+  margin-bottom: 10px;
   border: 1px solid #ccc;
-  border-radius: 8px; /* More rounded corners */
-  font-size: 1em;
+  border-radius: 6px; /* Slightly smaller border-radius */
+  font-size: 0.9em; /* Adjusted font size */
   color: var(--primary-text-color);
-  background-color: #f9f9f9;
+  background-color: #fefefe; /* Lighter background */
   transition: border-color 0.3s ease;
 }
 
@@ -94,21 +94,21 @@ input[type="date"]:focus {
 }
 
 button {
-  background-color: var(--sub-accent-color); /* Calm green for primary buttons */
+  background-color: var(--sub-accent-color); /* Green for primary buttons */
   color: var(--white);
-  padding: 12px 25px; /* Increased padding */
+  padding: 10px 20px; /* Adjusted padding */
   border: none;
-  border-radius: 8px; /* More rounded corners */
+  border-radius: 6px; /* Slightly smaller border-radius */
   cursor: pointer;
-  font-size: 1.1em;
-  margin-right: 15px;
+  font-size: 1em; /* Adjusted font size */
+  margin-right: 10px;
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-  background-color: var(--accent-color); /* Deep pink on hover */
-  transform: translateY(-2px); /* Slight lift effect */
+  background-color: var(--accent-color); /* Amber/Gold on hover */
+  transform: translateY(-1px); /* Subtle lift effect */
 }
 
 /* Event List Styling */
@@ -118,80 +118,80 @@ ul {
 }
 
 .event-list-item {
-  background-color: #f0f0f0; /* Lighter background for cards */
-  margin-bottom: 20px;
-  padding: 25px; /* Increased padding */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #fefefe; /* Lighter background for cards */
+  margin-bottom: 15px; /* Adjusted margin */
+  padding: 20px; /* Adjusted padding */
+  border-radius: 8px; /* Slightly smaller border-radius */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Adjusted shadow */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   text-align: left;
 }
 
 .event-list-item:hover {
-  transform: translateY(-5px); /* Lift effect on hover */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px); /* Subtle lift effect on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Adjusted shadow */
 }
 
 .event-list-item a {
   text-decoration: none;
   color: var(--dark-charcoal);
-  font-size: 1.5em; /* Larger text for event names */
+  font-size: 1.2em; /* Adjusted font size */
   font-weight: bold;
-  display: block; /* Make the whole card clickable */
+  display: block;
 }
 
 .event-list-item a:hover {
-  color: var(--accent-color); /* Accent color on hover */
+  color: var(--accent-color); /* Amber/Gold on hover */
 }
 
 /* Table Styling */
 table {
   width: 100%;
-  border-collapse: separate; /* Use separate for rounded corners */
+  border-collapse: separate;
   border-spacing: 0;
-  margin-top: 20px;
-  border-radius: 10px; /* Rounded corners for table */
-  overflow: hidden; /* Ensures rounded corners are visible */
+  margin-top: 15px; /* Adjusted margin */
+  border-radius: 8px; /* Slightly smaller border-radius */
+  overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
-  border: 1px solid #eee; /* Lighter border */
-  padding: 15px; /* Increased padding */
+  border: 1px solid #eee;
+  padding: 12px; /* Adjusted padding */
   text-align: center;
-  font-size: 1.1em;
+  font-size: 0.95em; /* Adjusted font size */
 }
 
 th {
-  background-color: var(--sub-accent-color); /* Calm green for table headers */
+  background-color: var(--sub-accent-color); /* Green for table headers */
   color: var(--white);
   font-weight: bold;
 }
 
 tr:nth-child(even) {
-  background-color: #f9f9f9; /* Zebra striping */
+  background-color: #fefefe; /* Lighter zebra striping */
 }
 
 tr:hover {
-  background-color: #f0f0f0; /* Subtle hover for rows */
+  background-color: #f5f5f5; /* Subtle hover for rows */
 }
 
 /* Radio buttons for attendance */
 td label {
-  margin: 0 10px;
-  font-size: 1em;
+  margin: 0 8px; /* Adjusted margin */
+  font-size: 0.9em; /* Adjusted font size */
   cursor: pointer;
 }
 
 td input[type="radio"] {
-  margin-right: 5px;
-  transform: scale(1.2); /* Slightly larger radio buttons */
+  margin-right: 4px; /* Adjusted margin */
+  transform: scale(1.1); /* Slightly smaller radio buttons */
   cursor: pointer;
 }
 
 /* Specific button styles */
 .date-inputs button {
-  background-color: var(--accent-color); /* Deep pink for "Add Date" */
+  background-color: var(--accent-color); /* Amber/Gold for "Add Date" */
 }
 
 .date-inputs button:hover {
@@ -201,9 +201,256 @@ td input[type="radio"] {
 /* EventPage toggle buttons */
 .event-page-toggle button {
   background-color: var(--dark-charcoal);
-  margin: 0 10px 20px 0;
+  margin: 0 8px 15px 0;
 }
 
 .event-page-toggle button:hover {
   background-color: var(--accent-color);
+}
+
+/* Button Link Styling */
+.button-link {
+  display: inline-block;
+  background-color: var(--sub-accent-color);
+  color: var(--white);
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 1em;
+  margin-top: 20px; /* Add some space above */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button-link:hover {
+  background-color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
+/* Checkbox Group Styling */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.checkbox-group label {
+  margin-bottom: 0; /* Override default label margin */
+  font-size: 1em;
+}
+
+/* Date Confirmation Section Styling */
+.date-confirmation-section {
+  background-color: #fefefe;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 25px;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.date-confirmation-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: var(--dark-charcoal);
+  font-size: 1.3em;
+}
+
+.date-confirmation-section select {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9em;
+  color: var(--primary-text-color);
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease;
+}
+
+.date-confirmation-section select:focus {
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+.date-confirmation-section button {
+  margin-top: 15px;
+  width: auto; /* Adjust button width */
+}
+
+/* Results Table Specific Styles */
+.name-input-in-table {
+  width: calc(100% - 10px);
+  padding: 5px;
+  margin: 0;
+  font-size: 0.8em;
+  text-align: center;
+}
+
+.attendance-buttons-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.attendance-button {
+  background-color: #f0f0f0; /* Light background for unselected */
+  color: var(--dark-charcoal);
+  border: 1px solid #ccc;
+  padding: 8px 12px; /* Adjust padding for size */
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em; /* Make text size consistent */
+  font-weight: bold;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  min-width: 40px; /* Ensure buttons are wide enough */
+}
+
+.attendance-button:hover {
+  background-color: #e0e0e0;
+}
+
+.attendance-button.selected {
+  background-color: var(--sub-accent-color); /* Green for selected */
+  color: var(--white);
+  border-color: var(--sub-accent-color);
+}
+
+.attendance-button.selected:hover {
+  background-color: var(--sub-accent-color); /* Keep color on hover if selected */
+}
+
+.submit-attendance-button {
+  width: auto; /* Override default button width */
+  margin-top: 10px;
+  background-color: var(--accent-color); /* Amber/Gold for submit */
+}
+
+.submit-attendance-button:hover {
+  background-color: var(--dark-charcoal);
+}
+
+/* Event Actions (Edit/Delete buttons on EventPage) */
+.event-actions {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.delete-button {
+  background-color: #dc3545; /* Red for delete */
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
+
+/* Edit Event Form */
+.edit-event-form {
+  background-color: #fefefe;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
+  text-align: left;
+}
+
+.edit-event-form h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--accent-color);
+  font-size: 1.8em;
+  text-align: center;
+}
+
+.edit-event-form .form-group {
+  margin-bottom: 15px;
+}
+
+.edit-event-form label {
+  font-size: 1em;
+}
+
+.edit-event-form input[type="text"],
+.edit-event-form input[type="date"],
+.edit-event-form textarea {
+  width: calc(100% - 24px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+
+.edit-event-form .date-input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.edit-event-form .date-input-group input {
+  flex-grow: 1;
+  margin-bottom: 0; /* Override default margin */
+}
+
+.remove-date-button {
+  background-color: #6c757d; /* Gray for remove */
+  padding: 8px 15px;
+  font-size: 0.9em;
+}
+
+.remove-date-button:hover {
+  background-color: #5a6268;
+}
+
+.edit-event-form button[type="submit"] {
+  background-color: var(--sub-accent-color);
+  margin-right: 10px;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+}
+
+/* Delete button on EventList item */
+.delete-button-list-item {
+  background-color: #dc3545;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+  margin-left: 10px;
+  float: right; /* Position to the right */
+}
+
+.delete-button-list-item:hover {
+  background-color: #c82333;
+}
+
+/* Back button */
+.back-button {
+  background-color: #6c757d; /* Gray for back button */
+  margin-bottom: 20px;
+  align-self: flex-start; /* Align to the left */
+}
+
+.back-button:hover {
+  background-color: #5a6268;
 }

@@ -38,7 +38,7 @@ app.use(express.json());
 
 // 1. Create a new event
 app.post('/api/events', async (req, res) => {
-  const { eventName, dates } = req.body;
+  const { eventName, dates, lastMinuteWelcome = false, description = '' } = req.body;
   if (!eventName || !dates || !Array.isArray(dates) || dates.length === 0) {
     return res.status(400).json({ error: 'イベント名と候補日程を提供してください。' });
   }
@@ -49,6 +49,9 @@ app.post('/api/events', async (req, res) => {
       dates,
       responses: [],
       createdAt: new Date(),
+      finalDate: null,
+      lastMinuteWelcome,
+      description,
     };
     const result = await db.collection('events').insertOne(newEvent);
     res.status(201).json({ _id: result.insertedId, ...newEvent });
@@ -58,10 +61,42 @@ app.post('/api/events', async (req, res) => {
   }
 });
 
-// 2. Get all events (for listing)
+// 2. Get all events (for listing) - Modified for filtering and sorting
 app.get('/api/events', async (req, res) => {
   try {
-    const events = await db.collection('events').find({}, { projection: { eventName: 1, dates: 1 } }).toArray();
+    const now = new Date();
+    const query = {};
+
+    query.$or = [
+      { finalDate: { $gte: now } },
+      { finalDate: null, dates: { $elemMatch: { $gte: now.toISOString().split('T')[0] } } }
+    ];
+
+    const events = await db.collection('events').find(query, { projection: { eventName: 1, dates: 1, finalDate: 1, lastMinuteWelcome: 1, description: 1 } }).toArray();
+
+    events.sort((a, b) => {
+      const aFinalDate = a.finalDate ? new Date(a.finalDate) : null;
+      const bFinalDate = b.finalDate ? new Date(b.finalDate) : null;
+
+      if (aFinalDate && bFinalDate) {
+        return aFinalDate.getTime() - bFinalDate.getTime();
+      }
+      if (aFinalDate) {
+        return -1;
+      }
+      if (bFinalDate) {
+        return 1;
+      }
+
+      const aEarliestDate = a.dates.length > 0 ? new Date(Math.min(...a.dates.map(d => new Date(d)))) : null;
+      const bEarliestDate = b.dates.length > 0 ? new Date(Math.min(...b.dates.map(d => new Date(d)))) : null;
+
+      if (aEarliestDate && bEarliestDate) {
+        return aEarliestDate.getTime() - bEarliestDate.getTime();
+      }
+      return 0;
+    });
+
     res.json(events);
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -84,6 +119,60 @@ app.get('/api/events/:id', async (req, res) => {
   }
 });
 
+// New API Endpoint: Update an event (Edit Event)
+app.put('/api/events/:id', async (req, res) => {
+  const { id } = req.params;
+  const { eventName, dates, lastMinuteWelcome, description } = req.body;
+
+  if (!eventName || !dates || !Array.isArray(dates) || dates.length === 0) {
+    return res.status(400).json({ error: 'イベント名と候補日程を提供してください。' });
+  }
+
+  try {
+    const result = await db.collection('events').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { eventName, dates, lastMinuteWelcome, description } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'イベントが見つかりません。' });
+    }
+    const updatedEvent = await db.collection('events').findOne({ _id: new ObjectId(id) });
+    res.json(updatedEvent);
+  } catch (error) {
+    console.error('Error updating event:', error);
+    res.status(500).json({ error: 'イベントの更新に失敗しました。' });
+  }
+});
+
+
+// New API Endpoint: Confirm Final Date for an event
+app.put('/api/events/:id/confirm-date', async (req, res) => {
+  const { id } = req.params;
+  const { finalDate } = req.body;
+
+  if (!finalDate) {
+    return res.status(400).json({ error: '確定する日程を提供してください。' });
+  }
+
+  try {
+    const result = await db.collection('events').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { finalDate: new Date(finalDate) } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'イベントが見つかりません。' });
+    }
+    const updatedEvent = await db.collection('events').findOne({ _id: new ObjectId(id) });
+    res.json(updatedEvent);
+  } catch (error) {
+    console.error('Error confirming final date:', error);
+    res.status(500).json({ error: '日程の確定に失敗しました。' });
+  }
+});
+
+
 // 4. Submit attendance response for an event
 app.post('/api/responses', async (req, res) => {
   const { eventId, name, attendance } = req.body;
@@ -99,7 +188,6 @@ app.post('/api/responses', async (req, res) => {
       return res.status(404).json({ error: 'イベントが見つかりません。' });
     }
 
-    // Update or add response
     const existingResponseIndex = event.responses.findIndex(r => r.name === name);
     if (existingResponseIndex > -1) {
       event.responses[existingResponseIndex] = { name, attendance };

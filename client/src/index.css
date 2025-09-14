@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Noto+Sans+JP:wght@400;700&display=swap');
 
 :root {
-  --primary-text-color: #232024;
-  --accent-color: #b33953;
-  --sub-accent-color: #017b63;
-  --dark-charcoal: #101820;
+  --primary-text-color: #8B4513; /* SaddleBrown - Darker text */
+  --accent-color: #FFC107; /* Amber/Gold - Beer color */
+  --sub-accent-color: #6B8E23; /* OliveDrab - Green accent */
+  --dark-charcoal: #4A2C00; /* Very dark brown for strong elements */
   --white: #FFFFFF;
-  --background-color: #008877;
+  --background-color: #FFF8DC; /* Cornsilk - Creamy foam background */
 }
 
 body {
@@ -16,7 +16,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--background-color);
   color: var(--primary-text-color);
-  line-height: 1.8; /* High line-height for airy feel */
+  line-height: 1.6; /* Slightly reduced line-height for smaller text */
+  font-size: 16px; /* Base font size */
 }
 
 code {

@@ -19,7 +19,7 @@ function App() {
     <BrowserRouter>
       <div className="App">
         <header className="App-header">
-          <h1>Drunk Scheduler</h1>
+          <h1>🍻 Drunk Scheduler 🍻</h1>
         </header>
         <main>
           <Routes>
