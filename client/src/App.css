@@ -743,7 +743,7 @@ th, td {
 .bubble {
   position: absolute;
   bottom: -100px; /* Start below the screen */
-  background-color: rgba(255, 193, 7, 0.15); /* Use a visible color (accent color with opacity) */
+  background-color: rgba(255, 255, 255, 0.2); /* White with slightly higher opacity */
   border-radius: 50%;
   animation: bubble-rise 25s infinite ease-in;
 }
