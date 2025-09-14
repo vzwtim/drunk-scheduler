@@ -497,6 +497,7 @@ th, td {
   padding: 8px; /* Reduced padding */
   font-size: 0.9em; /* Slightly smaller font size */
   vertical-align: middle; /* Add this for vertical alignment */
+  box-sizing: border-box; /* Ensure padding/border are inside width */
 }
 
 .name-input-in-table {

@@ -55,7 +55,7 @@ function EventSetup({ onEventCreated }) {
   return (
     <div>
       {/* Removed back button */}
-      <h2>1. イベントの作成</h2>
+      <h2>イベントの作成</h2>
       <form onSubmit={handleSubmit} className="event-setup-form">
         <div className="form-group">
           <label htmlFor="eventName">イベント名:</label>
