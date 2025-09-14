@@ -28,9 +28,6 @@ async function connectToMongo() {
   }
 }
 
-// Connect to MongoDB when the server starts
-connectToMongo();
-
 app.use(cors());
 app.use(express.json());
 
@@ -231,6 +228,12 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+// Move app.listen inside an async block that waits for connectToMongo
+async function startServer() {
+  await connectToMongo(); // Ensure DB connection is established
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+}
+
+startServer(); // Call the new async function to start the server
