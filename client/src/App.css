@@ -42,7 +42,7 @@ main {
   border-radius: 8px; /* Slightly smaller border-radius */
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Adjusted shadow */
   width: 100%;
-  max-width: 700px; /* Constrain main content width */
+  max-width: 1000px; /* Constrain main content width */
   margin-bottom: 30px; /* Adjusted vertical spacing */
 }
 
@@ -525,13 +525,14 @@ th, td {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .back-button-global:hover {
   background-color: rgba(255, 255, 255, 0.3);
   border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-50%);
 }
 
 .App-header {

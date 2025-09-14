@@ -175,6 +175,27 @@ app.put('/api/events/:id/confirm-date', async (req, res) => {
   }
 });
 
+// Add new API Endpoint: Unconfirm Final Date for an event
+app.put('/api/events/:id/unconfirm-date', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await db.collection('events').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { finalDate: null } } // Set finalDate back to null
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'イベントが見つかりません。' });
+    }
+    const updatedEvent = await db.collection('events').findOne({ _id: new ObjectId(id) });
+    res.json(updatedEvent);
+  } catch (error) {
+    console.error('Error unconfirming final date:', error);
+    res.status(500).json({ error: '日程の確定取り消しに失敗しました。' });
+  }
+});
+
 
 // 4. Submit attendance response for an event
 app.post('/api/responses', async (req, res) => {

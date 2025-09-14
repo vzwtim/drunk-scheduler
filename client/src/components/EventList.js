@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { isToday, isTomorrow, parseISO, format } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { ja } from 'date-fns/locale'; // Import Japanese locale
 
 function EventList() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchEvents = async () => { // Corrected function definition
+  const fetchEvents = async () => {
     try {
       const response = await fetch('/api/events');
       if (!response.ok) {
@@ -21,7 +21,7 @@ function EventList() {
     } finally {
       setLoading(false);
     }
-  }; // End of fetchEvents function
+  };
 
   useEffect(() => {
     fetchEvents();
@@ -46,8 +46,6 @@ function EventList() {
       // Check if finalDate is today or tomorrow
       if (isToday(finalDate) || isTomorrow(finalDate)) {
         todayTomorrowEvents.push(event);
-      } else {
-        upcomingConfirmedEvents.push(event);
       }
     } else {
       schedulingInProgressEvents.push(event);
@@ -72,7 +70,7 @@ function EventList() {
                 )}
                 {event.finalDate ? (
                   <span className="event-status-info">
-                    ({format(parseISO(event.finalDate), 'yyyy/MM/dd (EEE)', { locale: ja })} - {event.responses.length}人参加)
+                    ({format(parseISO(event.finalDate), 'yyyy/MM/dd (EEE)', { locale: ja })}) {/* Removed participant count */}
                   </span>
                 ) : (
                   <span className="event-status-info">

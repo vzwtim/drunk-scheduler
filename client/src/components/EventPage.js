@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Results from './Results';
-import { DayPicker } from 'react-day-picker'; // Import DayPicker
-import 'react-day-picker/dist/style.css'; // Import default styles
-import { format } from 'date-fns'; // For formatting dates
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
+import { format } from 'date-fns';
 
 function EventPage() {
   const { id: eventId } = useParams();
@@ -60,6 +60,25 @@ function EventPage() {
       fetchEventData();
     } catch (err) {
       console.error('Error confirming date:', err);
+      alert(err.message);
+    }
+  };
+
+  const handleUnconfirmDate = async () => {
+    if (!window.confirm('日程の確定を取り消しますか？')) {
+      return;
+    }
+    try {
+      const response = await fetch(`/api/events/${eventId}/unconfirm-date`, {
+        method: 'PUT',
+      });
+      if (!response.ok) {
+        throw new Error('日程の確定取り消しに失敗しました。');
+      }
+      alert('日程の確定を取り消しました。');
+      fetchEventData();
+    } catch (err) {
+      console.error('Error unconfirming date:', err);
       alert(err.message);
     }
   };
@@ -122,19 +141,22 @@ function EventPage() {
 
   return (
     <div className="event-page-container">
-      {/* Removed back button */}
-      <h1>{event.eventName}</h1>
+      <div className="event-header-with-actions"> {/* New container for header and actions */}
+        <h1>{event.eventName}</h1>
+        <div className="event-actions-top-right"> {/* New div for top-right actions */}
+          <button onClick={() => setIsEditing(true)} className="subtle-button">編集</button>
+          <button onClick={handleDeleteEvent} className="subtle-button delete-button-small">削除</button>
+        </div>
+      </div>
       {event.description && <p className="event-description">{event.description}</p>}
       <p>
         ステータス: <span style={{ color: statusColor, fontWeight: 'bold' }}>{eventStatus}</span>
         {event.finalDate && ` (${new Date(event.finalDate).toLocaleDateString()})`}
+        {event.finalDate && ( // Show unconfirm button only if date is confirmed
+          <button onClick={handleUnconfirmDate} className="subtle-button unconfirm-button-small">取り消し</button>
+        )}
       </p>
       {event.lastMinuteWelcome && <p style={{ color: 'var(--sub-accent-color)', fontWeight: 'bold' }}>ドタ参歓迎！</p>}
-
-      <div className="event-actions">
-        <button onClick={() => setIsEditing(true)}>イベントを編集</button>
-        <button onClick={handleDeleteEvent} className="delete-button">イベントを削除</button>
-      </div>
 
       {isEditing && (
         <EditEventForm

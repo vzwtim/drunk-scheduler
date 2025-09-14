@@ -108,14 +108,14 @@ function Results({ event, onResponseSubmitted }) {
     <div className="results-container">
       {/* Removed <h2>結果</h2> */}
 
-      <h3>参加者別詳細:</h3> {/* Keep this heading for now, user might want to remove it later */}
+      {/* Removed <h3>参加者別詳細:</h3> */}
       <form onSubmit={handleSubmit}>
         <table>
           <thead>
             <tr>
               <th>日程</th>
               {event.responses.map((response, index) => (
-                <th key={response.name || index} onClick={() => handleParticipantClick(response.name, response.attendance)} className="participant-name-header"> {/* Added onClick */}
+                <th key={response.name || index} onClick={() => handleParticipantClick(response.name, response.attendance)} className="participant-name-header"> 
                   {response.name}
                 </th>
               ))}
