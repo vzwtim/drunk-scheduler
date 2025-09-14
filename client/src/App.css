@@ -582,7 +582,6 @@ th, td {
   width: 140px; /* Fixed width for date and input columns */
 }
 
-.results-container table th,
 .results-container table td {
   /* The remaining columns will share the rest of the width equally */
   overflow-wrap: break-word;
@@ -744,7 +743,7 @@ th, td {
 .bubble {
   position: absolute;
   bottom: -100px; /* Start below the screen */
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 193, 7, 0.15); /* Use a visible color (accent color with opacity) */
   border-radius: 50%;
   animation: bubble-rise 25s infinite ease-in;
 }

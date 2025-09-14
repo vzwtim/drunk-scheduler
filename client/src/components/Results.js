@@ -151,18 +151,20 @@ function Results({ event, onResponseSubmitted }) {
               <tr>
               <th>日程</th>
               {event.responses.map((response, index) => (
-                <th key={response.name || index} className="participant-name-header">
-                  <span className="participant-name" onClick={() => handleParticipantClick(response.name, response.attendance)}>
-                    {response.name}
-                  </span>
-                  <button
-                    type="button"
-                    className="delete-participant-button"
-                    onClick={() => handleDeleteParticipant(response.name)}
-                    aria-label={`参加者 ${response.name} を削除`}
-                  >
-                    <FiTrash2 />
-                  </button>
+                <th key={response.name || index}>
+                  <div className="participant-name-header">
+                    <span className="participant-name" onClick={() => handleParticipantClick(response.name, response.attendance)}>
+                      {response.name}
+                    </span>
+                    <button
+                      type="button"
+                      className="delete-participant-button"
+                      onClick={() => handleDeleteParticipant(response.name)}
+                      aria-label={`参加者 ${response.name} を削除`}
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
                 </th>
               ))}
               <th>
