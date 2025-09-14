@@ -68,6 +68,9 @@ function Results({ event, onResponseSubmitted }) {
   const numFixedColumns = 2; // Date column and Input column
   const totalColumns = numParticipants + numFixedColumns;
 
+  // Calculate the minimum width of the table to ensure horizontal scroll appears correctly
+  const tableMinWidth = 140 + 140 + numParticipants * 100; // 140 for date, 140 for input, 100 for each participant
+
   // Calculate attendance summary for each date
   const dateAttendanceCounts = {};
   sortedDates.forEach(date => {
@@ -115,7 +118,7 @@ function Results({ event, onResponseSubmitted }) {
       {/* Removed <h3>参加者別詳細:</h3> */}
       <form onSubmit={handleSubmit}>
         <div className={`table-container ${numParticipants === 0 ? 'no-participants' : ''}`}> {/* Wrapper for horizontal scrolling */}
-          <table>
+          <table style={{ minWidth: tableMinWidth }}>
             <thead>
               <tr>
               <th>日程</th>

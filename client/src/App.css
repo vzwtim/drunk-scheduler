@@ -578,13 +578,6 @@ th, td {
 .results-container table th:last-child,
 .results-container table td:last-child {
   width: 140px; /* Fixed width for date and input columns */
-  min-width: 140px; /* Ensure fixed width doesn't shrink */
-}
-
-/* Style for the participant name columns in between */
-.results-container table th:not(:first-child):not(:last-child),
-.results-container table td:not(:first-child):not(:last-child) {
-  min-width: 100px; /* Minimum width for participant names */
 }
 
 .results-container table th,

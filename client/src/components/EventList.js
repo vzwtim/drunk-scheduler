@@ -89,7 +89,7 @@ function EventList() {
 
   return (
     <div>
-      <h2>イベント一覧</h2>
+      <h2>🍷飲み会一覧🍷</h2>
       {renderEventSection('今日・明日の飲み会', todayTomorrowEvents)}
       {renderEventSection('開催予定の飲み会', upcomingConfirmedEvents)}
       {renderEventSection('調整中の飲み会', schedulingInProgressEvents)}
