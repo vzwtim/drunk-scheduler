@@ -320,13 +320,13 @@ td input[type="radio"] {
 }
 
 .attendance-button.selected {
-  background-color: var(--sub-accent-color); /* Green for selected */
+  background-color: var(--sub-accent-color);
   color: var(--white);
   border-color: var(--sub-accent-color);
 }
 
 .attendance-button.selected:hover {
-  background-color: var(--sub-accent-color); /* Keep color on hover if selected */
+  background-color: var(--sub-accent-color);
 }
 
 .submit-attendance-button {
@@ -453,4 +453,88 @@ td input[type="radio"] {
 
 .back-button:hover {
   background-color: #5a6268;
+}
+
+/* Highlight most likely date row */
+.most-likely-date-row {
+  background-color: #fffacd; /* LemonChiffon - light yellow */
+  border-left: 5px solid var(--accent-color); /* Accent color border */
+}
+
+/* Attendance counts next to date */
+.attendance-counts {
+  display: block; /* Make it a block to go to next line */
+  font-size: 0.7em; /* Smaller font size */
+  color: #666; /* Slightly muted color */
+  margin-top: 5px; /* Space from date */
+}
+
+/* Table compactness */
+th, td {
+  padding: 8px; /* Reduced padding */
+  font-size: 0.9em; /* Slightly smaller font size */
+}
+
+.name-input-in-table {
+  padding: 3px; /* Reduced padding */
+  font-size: 0.75em; /* Slightly smaller font size */
+}
+
+.attendance-buttons-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px; /* Reduced gap */
+}
+
+.attendance-button {
+  padding: 6px 10px; /* Reduced padding */
+  font-size: 0.9em; /* Slightly smaller font size */
+  min-width: 35px; /* Adjusted min-width */
+}
+
+.attendance-button:hover {
+  background-color: #e0e0e0;
+}
+
+.attendance-button.selected {
+  background-color: var(--sub-accent-color);
+  color: var(--white);
+  border-color: var(--sub-accent-color);
+}
+
+.attendance-button.selected:hover {
+  background-color: var(--sub-accent-color);
+}
+
+/* Global back button */
+.back-button-global {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 15px;
+  border-radius: 50%;
+  font-size: 1.5em;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.back-button-global:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.App-header {
+  position: relative;
+  /* ... existing styles ... */
 }

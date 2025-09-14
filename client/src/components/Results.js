@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { format, parseISO } from 'date-fns';
+import { ja } from 'date-fns/locale';
 
 function Results({ event, onResponseSubmitted }) {
   const [name, setName] = useState('');
   const [attendance, setAttendance] = useState({});
 
+  // Sort dates chronologically
+  const sortedDates = [...event.dates].sort((a, b) => new Date(a) - new Date(b));
+
+  // Effect to pre-fill attendance if name matches an existing response
   useEffect(() => {
     if (event && name) {
       const existingResponse = event.responses.find(r => r.name === name);
       if (existingResponse) {
         setAttendance(existingResponse.attendance);
       } else {
-        setAttendance({});
+        setAttendance({}); // Clear if name doesn't match
       }
     }
   }, [event, name]);
@@ -49,13 +55,33 @@ function Results({ event, onResponseSubmitted }) {
     }
   };
 
+  const handleParticipantClick = (participantName, participantAttendance) => {
+    setName(participantName);
+    setAttendance(participantAttendance);
+  };
+
   if (!event) {
     return <div>イベントデータがありません。</div>;
   }
 
-  // Calculate attendance summary and most likely date
+  // Calculate attendance summary for each date
+  const dateAttendanceCounts = {};
+  sortedDates.forEach(date => {
+    dateAttendanceCounts[date] = { '○': 0, '△': 0, '×': 0 };
+  });
+
+  event.responses.forEach(response => {
+    for (const date in response.attendance) {
+      const status = response.attendance[date];
+      if (dateAttendanceCounts[date] && dateAttendanceCounts[date][status] !== undefined) {
+        dateAttendanceCounts[date][status]++;
+      }
+    }
+  });
+
+  // Calculate most likely date(s)
   const dateScores = {};
-  event.dates.forEach(date => {
+  sortedDates.forEach(date => {
     dateScores[date] = 0;
   });
 
@@ -67,27 +93,31 @@ function Results({ event, onResponseSubmitted }) {
     }
   });
 
-  let mostLikelyDate = null;
   let maxScore = -1;
+  let mostLikelyDates = [];
   for (const date in dateScores) {
     if (dateScores[date] > maxScore) {
       maxScore = dateScores[date];
-      mostLikelyDate = date;
+      mostLikelyDates = [date];
+    } else if (dateScores[date] === maxScore && maxScore > -1) {
+      mostLikelyDates.push(date);
     }
   }
 
   return (
     <div className="results-container">
-      <h2>結果</h2>
+      {/* Removed <h2>結果</h2> */}
 
-      <h3>参加者別詳細:</h3>
+      <h3>参加者別詳細:</h3> {/* Keep this heading for now, user might want to remove it later */}
       <form onSubmit={handleSubmit}>
         <table>
           <thead>
             <tr>
               <th>日程</th>
               {event.responses.map((response, index) => (
-                <th key={response.name || index}>{response.name}</th>
+                <th key={response.name || index} onClick={() => handleParticipantClick(response.name, response.attendance)} className="participant-name-header"> {/* Added onClick */}
+                  {response.name}
+                </th>
               ))}
               <th>
                 <input
@@ -102,9 +132,15 @@ function Results({ event, onResponseSubmitted }) {
             </tr>
           </thead>
           <tbody>
-            {event.dates.map(date => (
-              <tr key={date} className={date === mostLikelyDate ? 'most-likely-date' : ''}> {/* Highlight most likely date */}
-                <td>{date}</td>
+            {sortedDates.map(date => (
+              <tr key={date} className={mostLikelyDates.includes(date) ? 'most-likely-date-row' : ''}> 
+                <td>
+                  {format(parseISO(date), 'yyyy-MM-dd (EEE)', { locale: ja })} 
+                  <br />
+                  <span className="attendance-counts">
+                    ○{dateAttendanceCounts[date]['○']} △{dateAttendanceCounts[date]['△']} ×{dateAttendanceCounts[date]['×']}
+                  </span>
+                </td>
                 {event.responses.map((response, index) => (
                   <td key={index}>{response.attendance[date] || '-'}</td>
                 ))}
@@ -133,22 +169,8 @@ function Results({ event, onResponseSubmitted }) {
                 </td>
               </tr>
             ))}
-            {/* Summary row */}
             <tr>
-              <td>**集計**</td>
-              {event.responses.map((response, index) => (
-                <td key={index}></td> // Empty cells for participant columns
-              ))}
-              <td>
-                {mostLikelyDate && (
-                  <span style={{ fontWeight: 'bold', color: 'var(--sub-accent-color)' }}>
-                    最有力: {mostLikelyDate}
-                  </span>
-                )}
-              </td>
-            </tr>
-            <tr>
-              <td colSpan={event.dates.length + event.responses.length}> 
+              <td colSpan={sortedDates.length + event.responses.length + 1}> 
                 <button type="submit" className="submit-attendance-button">出欠を登録</button>
               </td>
             </tr>

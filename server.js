@@ -69,7 +69,7 @@ app.get('/api/events', async (req, res) => {
       { finalDate: null, dates: { $elemMatch: { $gte: now.toISOString().split('T')[0] } } }
     ];
 
-    const events = await db.collection('events').find(query, { projection: { eventName: 1, dates: 1, finalDate: 1, lastMinuteWelcome: 1, description: 1 } }).toArray();
+    const events = await db.collection('events').find(query, { projection: { eventName: 1, dates: 1, finalDate: 1, lastMinuteWelcome: 1, description: 1, responses: 1 } }).toArray();
 
     events.sort((a, b) => {
       const aFinalDate = a.finalDate ? new Date(a.finalDate) : null;
@@ -121,6 +121,9 @@ app.put('/api/events/:id', async (req, res) => {
   const { id } = req.params;
   const { eventName, dates, lastMinuteWelcome, description } = req.body;
 
+  console.log(`[PUT /api/events/${id}] Received update request.`);
+  console.log('Request body:', req.body);
+
   if (!eventName || !dates || !Array.isArray(dates) || dates.length === 0) {
     return res.status(400).json({ error: 'イベント名と候補日程を提供してください。' });
   }
@@ -131,7 +134,10 @@ app.put('/api/events/:id', async (req, res) => {
       { $set: { eventName, dates, lastMinuteWelcome, description } }
     );
 
+    console.log('MongoDB update result:', result);
+
     if (result.matchedCount === 0) {
+      console.log(`Event with ID ${id} not found for update.`);
       return res.status(404).json({ error: 'イベントが見つかりません。' });
     }
     const updatedEvent = await db.collection('events').findOne({ _id: new ObjectId(id) });

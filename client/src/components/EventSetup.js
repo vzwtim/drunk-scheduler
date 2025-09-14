@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
+import { format } from 'date-fns';
 
 function EventSetup({ onEventCreated }) {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [eventName, setEventName] = useState('');
-  const [dates, setDates] = useState(['']);
+  const [dates, setDates] = useState([]);
   const [lastMinuteWelcome, setLastMinuteWelcome] = useState(false);
   const [description, setDescription] = useState('');
 
-  const handleAddDate = () => {
-    setDates([...dates, '']);
-  };
-
-  const handleDateChange = (index, value) => {
-    const newDates = [...dates];
-    newDates[index] = value;
-    setDates(newDates);
+  const handleDayPickerSelect = (selectedDays) => {
+    if (selectedDays) {
+      const formattedDates = Array.from(selectedDays).map(date => format(date, 'yyyy-MM-dd'));
+      setDates(formattedDates);
+    } else {
+      setDates([]);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -51,7 +53,7 @@ function EventSetup({ onEventCreated }) {
 
   return (
     <div>
-      <button onClick={() => navigate(-1)} className="back-button">戻る</button> {/* Back button */}
+      {/* Removed back button */}
       <h2>1. イベントの作成</h2>
       <form onSubmit={handleSubmit} className="event-setup-form">
         <div className="form-group">
@@ -77,19 +79,19 @@ function EventSetup({ onEventCreated }) {
           ></textarea>
         </div>
 
-        <h3>候補日程の入力</h3>
-        <div className="date-inputs">
-          {dates.map((date, index) => (
-            <div key={index} className="date-input-group">
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => handleDateChange(index, e.target.value)}
-              />
-            </div>
-          ))}
+        <h3>候補日程の選択</h3>
+        <div className="date-picker-container">
+          <DayPicker
+            mode="multiple"
+            selected={dates.map(d => new Date(d))}
+            onSelect={handleDayPickerSelect}
+            showOutsideDays
+            fixedWeeks
+          />
+          {dates.length > 0 && (
+            <p>選択中の日程: {dates.sort().join(', ')}</p>
+          )}
         </div>
-        <button type="button" onClick={handleAddDate}>日程を追加</button>
         
         <div className="form-group checkbox-group">
           <input

@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { isToday, isTomorrow, parseISO, format } from 'date-fns';
+import { ja } from 'date-fns/locale';
 
 function EventList() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchEvents = async () => { // Made fetchEvents a separate function for reusability
+  const fetchEvents = async () => { // Corrected function definition
     try {
-      const response = await fetch('/api/events'); // Backend now handles filtering and sorting
+      const response = await fetch('/api/events');
       if (!response.ok) {
         throw new Error('イベントの取得に失敗しました。');
       }
@@ -19,30 +21,11 @@ function EventList() {
     } finally {
       setLoading(false);
     }
-  };
+  }; // End of fetchEvents function
 
   useEffect(() => {
     fetchEvents();
   }, []);
-
-  const handleDeleteEvent = async (eventId, eventName) => {
-    if (!window.confirm(`本当にイベント「${eventName}」を削除しますか？この操作は元に戻せません。`)) {
-      return;
-    }
-    try {
-      const response = await fetch(`/api/events/${eventId}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        throw new Error('イベントの削除に失敗しました。');
-      }
-      alert(`イベント「${eventName}」を削除しました。`);
-      fetchEvents(); // Re-fetch events after deletion
-    } catch (err) {
-      console.error('Error deleting event:', err);
-      alert(err.message);
-    }
-  };
 
   if (loading) {
     return <div>イベントを読み込み中...</div>;
@@ -52,42 +35,64 @@ function EventList() {
     return <div>エラー: {error}</div>;
   }
 
-  return (
-    <div>
-      <h2>開催中のイベント</h2>
-      {events.length === 0 ? (
-        <p>現在、開催中のイベントはありません。</p>
+  // Categorize events
+  const todayTomorrowEvents = [];
+  const upcomingConfirmedEvents = [];
+  const schedulingInProgressEvents = [];
+
+  events.forEach(event => {
+    if (event.finalDate) {
+      const finalDate = parseISO(event.finalDate);
+      // Check if finalDate is today or tomorrow
+      if (isToday(finalDate) || isTomorrow(finalDate)) {
+        todayTomorrowEvents.push(event);
+      } else {
+        upcomingConfirmedEvents.push(event);
+      }
+    } else {
+      schedulingInProgressEvents.push(event);
+    }
+  });
+
+  const renderEventSection = (title, eventArray) => (
+    <div className="event-section">
+      <h3>{title}</h3>
+      {eventArray.length === 0 ? (
+        <p>現在、{title}はありません。</p>
       ) : (
         <ul>
-          {events.map(event => (
+          {eventArray.map(event => (
             <li key={event._id} className="event-list-item">
               <Link to={`/event/${event._id}`}>
                 {event.eventName}
-                {event.finalDate ? (
-                  <span style={{ color: 'var(--sub-accent-color)', fontWeight: 'bold', marginLeft: '10px' }}>
-                    日程確定 ({new Date(event.finalDate).toLocaleDateString()})
-                  </span>
-                ) : (
-                  <span style={{ color: 'var(--accent-color)', fontWeight: 'bold', marginLeft: '10px' }}>
-                    日程調整中
+                {event.lastMinuteWelcome && (
+                  <span className="last-minute-welcome-tag">
+                    ドタ参歓迎！
                   </span>
                 )}
-                {event.lastMinuteWelcome && (
-                  <span style={{ color: 'var(--sub-accent-color)', marginLeft: '10px' }}>
-                    (ドタ参歓迎)
+                {event.finalDate ? (
+                  <span className="event-status-info">
+                    ({format(parseISO(event.finalDate), 'yyyy/MM/dd (EEE)', { locale: ja })} - {event.responses.length}人参加)
+                  </span>
+                ) : (
+                  <span className="event-status-info">
+                    (調整中)
                   </span>
                 )}
               </Link>
-              <button
-                onClick={(e) => { e.preventDefault(); handleDeleteEvent(event._id, event.eventName); }}
-                className="delete-button-list-item"
-              >
-                削除
-              </button>
             </li>
           ))}
         </ul>
       )}
+    </div>
+  );
+
+  return (
+    <div>
+      <h2>イベント一覧</h2>
+      {renderEventSection('今日・明日の飲み会', todayTomorrowEvents)}
+      {renderEventSection('開催予定の飲み会', upcomingConfirmedEvents)}
+      {renderEventSection('調整中の飲み会', schedulingInProgressEvents)}
       <Link to="/create" className="button-link">新しいイベントを作成</Link>
     </div>
   );

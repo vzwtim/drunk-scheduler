@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Results from './Results';
+import { DayPicker } from 'react-day-picker'; // Import DayPicker
+import 'react-day-picker/dist/style.css'; // Import default styles
+import { format } from 'date-fns'; // For formatting dates
 
 function EventPage() {
   const { id: eventId } = useParams();
@@ -119,7 +122,7 @@ function EventPage() {
 
   return (
     <div className="event-page-container">
-      <button onClick={() => navigate(-1)} className="back-button">戻る</button> {/* Back button */}
+      {/* Removed back button */}
       <h1>{event.eventName}</h1>
       {event.description && <p className="event-description">{event.description}</p>}
       <p>
@@ -165,23 +168,17 @@ function EventPage() {
 // New component for editing event details
 function EditEventForm({ event, onUpdate, onCancel }) {
   const [eventName, setEventName] = useState(event.eventName);
-  const [dates, setDates] = useState(event.dates);
+  const [dates, setDates] = useState(event.dates.map(d => new Date(d)));
   const [lastMinuteWelcome, setLastMinuteWelcome] = useState(event.lastMinuteWelcome);
   const [description, setDescription] = useState(event.description || '');
 
-  const handleAddDate = () => {
-    setDates([...dates, '']);
-  };
-
-  const handleDateChange = (index, value) => {
-    const newDates = [...dates];
-    newDates[index] = value;
-    setDates(newDates);
-  };
-
-  const handleRemoveDate = (index) => {
-    const newDates = dates.filter((_, i) => i !== index);
-    setDates(newDates);
+  const handleDayPickerSelect = (selectedDays) => {
+    if (selectedDays) {
+      const formattedDates = Array.from(selectedDays).map(date => format(date, 'yyyy-MM-dd'));
+      setDates(formattedDates);
+    } else {
+      setDates([]);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -223,17 +220,18 @@ function EditEventForm({ event, onUpdate, onCancel }) {
         </div>
         <div className="form-group">
           <label>候補日程:</label>
-          {dates.map((date, index) => (
-            <div key={index} className="date-input-group">
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => handleDateChange(index, e.target.value)}
-              />
-              <button type="button" onClick={() => handleRemoveDate(index)} className="remove-date-button">削除</button>
-            </div>
-          ))}
-          <button type="button" onClick={handleAddDate}>日程を追加</button>
+          <div className="date-picker-container">
+            <DayPicker
+              mode="multiple"
+              selected={dates} 
+              onSelect={handleDayPickerSelect}
+              showOutsideDays
+              fixedWeeks
+            />
+            {dates.length > 0 && (
+              <p>選択中の日程: {dates.map(d => format(d, 'yyyy-MM-dd')).sort().join(', ')}</p>
+            )}
+          </div>
         </div>
         <div className="form-group checkbox-group">
           <input
