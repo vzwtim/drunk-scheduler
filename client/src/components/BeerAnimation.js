@@ -1,73 +1,159 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 const BeerAnimation = () => {
+  const canvasRef = useRef(null);
+  const animationFrameId = useRef(null);
+  const [level, setLevel] = useState(50); // Initial liquid level (0-100)
   const [tiltX, setTiltX] = useState(0); // For left-right tilt (gamma)
   const [tiltY, setTiltY] = useState(0); // For front-to-back tilt (beta)
-  const [isSpilling, setIsSpilling] = useState(false); // New state for spilling
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let w, h;
+    let particles = [];
+    let c = 0; // Animation counter for wave
+
+    // Particle object constructor (adapted from user's code)
+    function particle(x, y, d) {
+      this.x = x;
+      this.y = y;
+      this.d = d;
+      this.respawn = function() {
+        // Respawn particles within the liquid area
+        const liquidTop = h - (h - 100) * level / 100 - 50;
+        this.x = Math.random() * (w * 0.8) + (0.1 * w);
+        this.y = Math.random() * (h - liquidTop) + liquidTop; // Respawn within liquid
+        this.d = Math.random() * 5 + 5;
+      };
+    }
+
+    const resizeCanvas = () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+      init(); // Re-initialize particles on resize
+    };
+
+    // Function to start or restart the animation
+    const init = () => {
+      c = 0;
+      particles = [];
+      for (let i = 0; i < 40; i++) {
+        const obj = new particle(0, 0, 0);
+        obj.respawn();
+        particles.push(obj);
+      }
+      if (animationFrameId.current) {
+        window.cancelAnimationFrame(animationFrameId.current);
+      }
+      animationFrameId.current = window.requestAnimationFrame(draw);
+    };
+
+    // Function that draws into the canvas in a loop
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      const liquidColor = "#f9a825"; // Beer color
+      const foamColor = "rgba(255, 255, 255, 0.8)"; // Foam color
+
+      // Calculate liquid surface based on level and tilt
+      const baseLiquidY = h - (h - 100) * level / 100 - 50; // Adjusted for fuller look
+      const waveAmplitude = 15; // Max wave height
+      const waveFrequency = 0.05; // How fast the wave oscillates
+      const tiltInfluenceX = tiltX * 0.5; // Tilt influences wave position
+      const tiltInfluenceY = tiltY * 0.5; // Tilt influences overall liquid height
+
+      // Draw the liquid
+      ctx.fillStyle = liquidColor;
+      ctx.beginPath();
+      ctx.moveTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX) + tiltInfluenceY);
+      ctx.bezierCurveTo(
+        w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX + Math.PI / 2) + tiltInfluenceY,
+        2 * w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX + Math.PI) + tiltInfluenceY,
+        w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX + 3 * Math.PI / 2) + tiltInfluenceY
+      );
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw the foam layer slightly above the liquid
+      ctx.fillStyle = foamColor;
+      ctx.beginPath();
+      const foamOffset = 5; // Foam sits slightly above liquid
+      ctx.moveTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX) + tiltInfluenceY - foamOffset);
+      ctx.bezierCurveTo(
+        w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX + Math.PI / 2) + tiltInfluenceY - foamOffset,
+        2 * w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX + Math.PI) + tiltInfluenceY - foamOffset,
+        w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX + 3 * Math.PI / 2) + tiltInfluenceY - foamOffset
+      );
+      ctx.lineTo(w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX + 3 * Math.PI / 2) + tiltInfluenceY);
+      ctx.lineTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX) + tiltInfluenceY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw the bubbles
+      ctx.strokeStyle = foamColor; // Bubbles are foam-colored
+      for (let i = 0; i < 40; i++) {
+        ctx.beginPath();
+        ctx.arc(particles[i].x, particles[i].y, particles[i].d, 0, 2 * Math.PI);
+        ctx.stroke(); // Hollow bubbles
+      }
+
+      update();
+      animationFrameId.current = window.requestAnimationFrame(draw);
+    };
+
+    // Function that updates variables
+    const update = () => {
+      c++;
+      if (100 * Math.PI <= c) c = 0; // Reset counter
+      for (let i = 0; i < 40; i++) {
+        particles[i].x = particles[i].x + Math.random() * 2 - 1;
+        particles[i].y = particles[i].y - 1;
+        particles[i].d = particles[i].d - 0.04;
+        if (particles[i].d <= 0) particles[i].respawn();
+      }
+    };
+
+    // Device orientation handler
     const handleOrientation = (event) => {
       const gamma = event.gamma; // Left-to-right tilt
       const beta = event.beta;   // Front-to-back tilt
 
-      // Check for spilling condition
+      // Spilling logic
       const spillThreshold = 70; // Degrees
       if (Math.abs(gamma) > spillThreshold || Math.abs(beta) > spillThreshold) {
-        if (!isSpilling) { // Only trigger spill once
-          setIsSpilling(true);
-          // Reset spilling state after a short animation
-          setTimeout(() => {
-            setIsSpilling(false);
-          }, 1000); // Spill animation duration
-        }
+        // Reduce level if spilling
+        setLevel(prevLevel => Math.max(0, prevLevel - 0.5)); // Gradual reduction
+      } else {
+        // Gradually restore level if not spilling and below max
+        setLevel(prevLevel => Math.min(50, prevLevel + 0.1)); // Restore to 50
       }
 
-      // Constrain tilt values to a reasonable range for normal movement
-      const newTiltX = Math.max(-45, Math.min(45, gamma));
-      const newTiltY = Math.max(-45, Math.min(45, beta));
-
-      setTiltX(newTiltX);
-      setTiltY(newTiltY);
+      setTiltX(gamma); // Use raw gamma for wave effect
+      setTiltY(beta);  // Use raw beta for wave effect
     };
 
     if (window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', handleOrientation);
     }
 
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas(); // Initial setup
+
     return () => {
+      window.removeEventListener('resize', resizeCanvas);
       if (window.DeviceOrientationEvent) {
         window.removeEventListener('deviceorientation', handleOrientation);
       }
+      if (animationFrameId.current) {
+        window.cancelAnimationFrame(animationFrameId.current);
+      }
     };
-  }, [isSpilling]); // Re-run effect if isSpilling changes to update event listener logic
-
-  // Calculate dynamic styles for liquid and foam
-  const liquidStyle = {
-    bottom: `calc(-120% + ${tiltY * 0.5}px)`,
-    transform: `translateX(-50%) rotate(${tiltX}deg) skewX(${tiltX * 0.2}deg)`,
-    // Add spilling animation
-    ...(isSpilling && {
-      transform: `translateX(-50%) translateY(100%) rotate(${tiltX}deg) scale(0.8)`,
-      opacity: 0,
-      transition: 'transform 1s ease-in, opacity 1s ease-in',
-    }),
-  };
-
-  const foamStyle = {
-    transform: `rotate(${tiltX * 0.8}deg) skewX(${tiltX * 0.1}deg)`,
-    ...(isSpilling && {
-      transform: `translateY(100%) rotate(${tiltX * 0.8}deg) scale(0.8)`,
-      opacity: 0,
-      transition: 'transform 1s ease-in, opacity 1s ease-in',
-    }),
-  };
+  }, [level, tiltX, tiltY]); // Re-run effect if level or tilt changes
 
   return (
-    <div className="beer-container">
-      <div className="beer-liquid" style={liquidStyle}>
-        <div className="beer-foam" style={foamStyle}></div>
-      </div>
-    </div>
+    <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, zIndex: 0 }} />
   );
 };
 

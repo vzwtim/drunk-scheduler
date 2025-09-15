@@ -917,40 +917,5 @@ th, td {
   z-index: 3; /* Must be on top of both header row and first column */
 }
 
-/* Beer Slosh Animation */
-.beer-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0; /* Behind bubbles and content */
-  pointer-events: none;
-  overflow: hidden; /* The container itself should hide the overflow */
-}
 
-.beer-liquid {
-  position: absolute;
-  bottom: -120%; /* Make it fuller */
-  left: 50%;
-  width: 250vw;
-  height: 250vw;
-  background: #f9a825; /* A nice beer color */
-  border-radius: 40%;
-  transform-origin: center bottom; /* Rotate from the bottom center */
-  transition: transform 0.1s ease-out, bottom 0.1s ease-out; /* Smoother, quicker transitions */
-  opacity: 0.9;
-}
-
-.beer-foam {
-  position: absolute;
-  top: 5%; /* Position foam at the top of the liquid */
-  left: 50%;
-  width: 90%; /* Slightly smaller than liquid width */
-  height: 10%; /* Foam height */
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  transform: translateX(-50%);
-  transition: transform 0.1s ease-out;
-}
 
