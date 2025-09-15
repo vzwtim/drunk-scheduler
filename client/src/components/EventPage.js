@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiEdit, FiTrash2 } from 'react-icons/fi'; // Import icons
+import { FiEdit, FiTrash2, FiArrowLeft } from 'react-icons/fi'; // Import icons
 import Results from './Results';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
@@ -142,8 +142,10 @@ function EventPage() {
 
   return (
     <div className="event-page-container">
-      <button onClick={() => navigate(-1)} className="back-button">← 戻る</button>
       <div className="event-header-with-actions"> {/* New container for header and actions */}
+        <button onClick={() => navigate(-1)} className="back-button-global" aria-label="戻る">
+          <FiArrowLeft />
+        </button>
         <h1>{event.eventName}</h1>
         <div className="event-actions-top-right"> {/* New div for top-right actions */}
           <button onClick={() => setIsEditing(true)} className="icon-button" aria-label="編集">

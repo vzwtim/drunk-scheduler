@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FiArrowLeft } from 'react-icons/fi';
 import TextareaAutosize from 'react-textarea-autosize';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
@@ -54,8 +55,12 @@ function EventSetup({ onEventCreated }) {
 
   return (
     <div>
-      <button onClick={() => navigate(-1)} className="back-button">← 戻る</button>
-      <h2>イベントの作成</h2>
+      <div className="page-header">
+        <button onClick={() => navigate(-1)} className="back-button-global" aria-label="戻る">
+          <FiArrowLeft />
+        </button>
+        <h2>イベントの作成</h2>
+      </div>
       <form onSubmit={handleSubmit} className="event-setup-form">
         <div className="form-group">
           <label htmlFor="eventName">イベント名:</label>

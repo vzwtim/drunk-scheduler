@@ -29,6 +29,12 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Adjusted shadow */
 }
 
+.page-header {
+  position: relative;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
 .App-header h1 {
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
@@ -175,7 +181,6 @@ table {
   border-spacing: 0;
   margin-top: 15px; /* Adjusted margin */
   border-radius: 8px; /* Slightly smaller border-radius */
-  overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   table-layout: fixed; /* Add this */
 }
@@ -469,16 +474,7 @@ td input[type="radio"] {
   background-color: #c82333;
 }
 
-/* Back button */
-.back-button {
-  background-color: #6c757d; /* Gray for back button */
-  margin-bottom: 20px;
-  align-self: flex-start; /* Align to the left */
-}
 
-.back-button:hover {
-  background-color: #5a6268;
-}
 
 /* Highlight most likely date row */
 .most-likely-date-row {
@@ -537,13 +533,13 @@ th, td {
 /* Global back button */
 .back-button-global {
   position: absolute;
-  left: 20px;
+  left: 0; /* Adjust as needed */
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(255, 255, 255, 0.2);
-  color: var(--white);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 8px 15px;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--primary-text-color);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 8px;
   border-radius: 50%;
   font-size: 1.5em;
   line-height: 1;
@@ -552,14 +548,13 @@ th, td {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .back-button-global:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.2);
 }
 
 .App-header {
@@ -755,14 +750,14 @@ th, td {
 @keyframes bubble-rise {
   0% {
     transform: translateY(0) translateX(0);
-    opacity: 0.8;
+    opacity: 1;
   }
   50% {
     transform: translateX(50px);
   }
   100% {
     transform: translateY(-1080px) translateX(-50px);
-    opacity: 0;
+    opacity: 1;
   }
 }
 
