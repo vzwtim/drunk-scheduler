@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import TextareaAutosize from 'react-textarea-autosize';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { format } from 'date-fns';
 
 function EventSetup({ onEventCreated }) {
+  const navigate = useNavigate();
   const [eventName, setEventName] = useState('');
   const [dates, setDates] = useState([]);
   const [lastMinuteWelcome, setLastMinuteWelcome] = useState(false);
@@ -52,7 +54,7 @@ function EventSetup({ onEventCreated }) {
 
   return (
     <div>
-      {/* Removed back button */}
+      <button onClick={() => navigate(-1)} className="back-button">← 戻る</button>
       <h2>イベントの作成</h2>
       <form onSubmit={handleSubmit} className="event-setup-form">
         <div className="form-group">

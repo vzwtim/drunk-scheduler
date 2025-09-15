@@ -21,7 +21,7 @@ function AppContent() {
       </div>
       <header className="App-header">
         <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <h1>Drunk Scheduler</h1>
+          <h1>🍻Drunk Scheduler🍻</h1>
         </Link>
       </header>
       <main>

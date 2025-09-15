@@ -142,6 +142,7 @@ function EventPage() {
 
   return (
     <div className="event-page-container">
+      <button onClick={() => navigate(-1)} className="back-button">← 戻る</button>
       <div className="event-header-with-actions"> {/* New container for header and actions */}
         <h1>{event.eventName}</h1>
         <div className="event-actions-top-right"> {/* New div for top-right actions */}
@@ -157,11 +158,15 @@ function EventPage() {
       <p>
         ステータス: <span style={{ color: statusColor, fontWeight: 'bold' }}>{eventStatus}</span>
         {event.finalDate && ` (${new Date(event.finalDate).toLocaleDateString()})`}
+        {event.lastMinuteWelcome && (
+          <span style={{ color: '#dc3545', fontSize: '0.9em', marginLeft: '10px', fontWeight: 'bold' }}>
+            ドタ参歓迎！
+          </span>
+        )}
         {event.finalDate && ( // Show unconfirm button only if date is confirmed
           <button onClick={handleUnconfirmDate} className="subtle-button">取り消し</button>
         )}
       </p>
-      {event.lastMinuteWelcome && <p style={{ color: 'var(--sub-accent-color)', fontWeight: 'bold' }}>ドタ参歓迎！</p>}
 
       {isEditing && (
         <EditEventForm
