@@ -14,7 +14,7 @@ const BeerAnimation = () => {
     // console.log('Tilt X (gamma):', gamma, 'Tilt Y (beta):', event.beta); // Debugging tilt values
 
     setTiltX(gamma);
-  }, []); // No dependencies, as it only uses event data
+  }, []);
 
   // Define requestDeviceOrientationPermission outside useEffect
   const requestDeviceOrientationPermission = useCallback(async () => {
@@ -33,29 +33,47 @@ const BeerAnimation = () => {
         setPermissionGranted(false);
       }
     } else {
-      // For browsers that don't require permission (e.g., Android Chrome, older iOS)
       window.addEventListener('deviceorientation', handleOrientation);
       setPermissionGranted(true);
     }
-  }, [handleOrientation, setPermissionGranted]); // Dependencies for useCallback
+  }, [handleOrientation, setPermissionGranted]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     let w, h;
+    let particles = []; // RE-INTRODUCED
     let c = 0; // Animation counter for wave
+
+    // Particle object constructor (RE-INTRODUCED)
+    function particle(x, y, d) {
+      this.x = x;
+      this.y = y;
+      this.d = d;
+      this.respawn = function() {
+        // Respawn particles from below the liquid surface
+        const baseLiquidY = h - (h - 100) * level / 100 - 50;
+        this.x = Math.random() * w; // Random X across full width
+        this.y = baseLiquidY + Math.random() * (h - baseLiquidY); // Start between liquid surface and bottom
+        this.d = Math.random() * 5 + 5;
+      };
+    }
 
     const resizeCanvas = () => {
       w = canvas.width = window.innerWidth;
       h = canvas.height = window.innerHeight;
-      if (animationFrameId.current) {
-        window.cancelAnimationFrame(animationFrameId.current);
-      }
-      init(); // Call init after resize
+      init(); // Re-initialize particles on resize
     };
 
+    // Function to start or restart the animation (RE-INTRODUCED particle init)
     const init = () => {
       c = 0;
+      particles = []; // RE-INTRODUCED
+      for (let i = 0; i < 40; i++) { // RE-INTRODUCED
+        const obj = new particle(0, 0, 0); // RE-INTRODUCED
+        obj.respawn(); // RE-INTRODUCED
+        particles.push(obj); // RE-INTRODUCED
+      }
       if (animationFrameId.current) {
         window.cancelAnimationFrame(animationFrameId.current);
       }
@@ -73,16 +91,13 @@ const BeerAnimation = () => {
       ctx.translate(-w / 2, -h / 2); // Move origin back
 
       const liquidColor = "#f9a825"; // Beer color
-      const foamColor = "rgba(255, 255, 255, 0.8)"; // Foam color
+      const foamColor = "rgba(255, 255, 255, 0.8)"; // Bubbles color
 
-      // --- Ensure background is always covered by liquid color ---
-      // Draw a large rectangle with liquid color to cover the entire rotated area
-      ctx.fillStyle = liquidColor;
-      ctx.fillRect(-w * 0.5, -h * 0.5, w * 2, h * 2); // Draw a rectangle larger than canvas
+      // --- Background fill removed as per user request ---
 
       // Calculate liquid surface based on level (now fixed)
       const baseLiquidY = h - (h - 100) * level / 100 - 50; // Adjusted for fuller look
-      const waveAmplitude = 8; // Reduced wave height for less wildness
+      const waveAmplitude = 32; // Increased wave height for thicker surface
       const waveFrequency = 0.05; // How fast the wave oscillates
 
       // Draw the liquid (now drawn relative to the rotated context)
@@ -99,20 +114,15 @@ const BeerAnimation = () => {
       ctx.closePath();
       ctx.fill();
 
-      // Draw the foam layer slightly above the liquid
-      ctx.fillStyle = foamColor;
-      ctx.beginPath();
-      const foamOffset = 15; // Increased foam thickness/height
-      ctx.moveTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency) - foamOffset);
-      ctx.bezierCurveTo(
-        w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI / 2) - foamOffset,
-        2 * w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI) - foamOffset,
-        w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2) - foamOffset
-      );
-      ctx.lineTo(w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2));
-      ctx.lineTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency));
-      ctx.closePath();
-      ctx.fill();
+      // --- Foam drawing logic removed as per user request ---
+
+      // Draw the bubbles (RE-INTRODUCED, now filled circles, drawn relative to rotated screen)
+      ctx.fillStyle = foamColor; // Bubbles are foam-colored and filled
+      for (let i = 0; i < 40; i++) {
+        ctx.beginPath();
+        ctx.arc(particles[i].x, particles[i].y, particles[i].d, 0, 2 * Math.PI);
+        ctx.fill(); // Filled bubbles
+      }
 
       ctx.restore(); // Restore the un-rotated state
 
@@ -120,14 +130,26 @@ const BeerAnimation = () => {
       animationFrameId.current = window.requestAnimationFrame(draw);
     };
 
+    // Function that updates variables (RE-INTRODUCED particle update)
     const update = () => {
       c++;
       if (100 * Math.PI <= c) c = 0; // Reset counter
+      for (let i = 0; i < 40; i++) { // RE-INTRODUCED
+        particles[i].x = particles[i].x + Math.random() * 2 - 1; // RE-INTRODUCED
+        particles[i].y = particles[i].y - 1; // RE-INTRODUCED
+        particles[i].d = particles[i].d - 0.04; // RE-INTRODUCED
+        if (particles[i].d <= 0) particles[i].respawn(); // RE-INTRODUCED
+      }
     };
 
-    // Initial setup
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas(); // Initial call to set w, h and start animation
+    // Device orientation handler
+    const handleOrientation = (event) => {
+      const gamma = event.gamma; // Left-to-right tilt
+
+      // console.log('Tilt X (gamma):', gamma, 'Tilt Y (beta):', event.beta); // Debugging tilt values
+
+      setTiltX(gamma);
+    };
 
     if (window.DeviceOrientationEvent) {
       requestDeviceOrientationPermission(); // Call the memoized function
@@ -135,6 +157,9 @@ const BeerAnimation = () => {
       console.warn('DeviceOrientationEvent not supported on this browser.');
       setPermissionGranted(false);
     }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas(); // Initial call to set w, h and start animation
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
@@ -145,7 +170,7 @@ const BeerAnimation = () => {
         window.cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [level, permissionGranted, requestDeviceOrientationPermission, handleOrientation, tiltX]); // Add tiltX to dependencies
+  }, [level, permissionGranted, requestDeviceOrientationPermission, handleOrientation, tiltX]);
 
   return (
     <>
