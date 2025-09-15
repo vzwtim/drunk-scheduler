@@ -1,12 +1,43 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 
 const BeerAnimation = () => {
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
   const [level] = useState(50); // Initial liquid level (0-100), now fixed
   const [tiltX, setTiltX] = useState(0); // For left-right tilt (gamma)
-  const [tiltY, setTiltY] = useState(0); // For front-to-back tilt (beta)
   const [permissionGranted, setPermissionGranted] = useState(false); // New state for permission
+
+  // Device orientation handler
+  const handleOrientation = useCallback((event) => {
+    const gamma = event.gamma; // Left-to-right tilt
+
+    // console.log('Tilt X (gamma):', gamma, 'Tilt Y (beta):', event.beta); // Debugging tilt values
+
+    setTiltX(gamma);
+  }, []); // No dependencies, as it only uses event data
+
+  // Define requestDeviceOrientationPermission outside useEffect
+  const requestDeviceOrientationPermission = useCallback(async () => {
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      try {
+        const permissionState = await DeviceOrientationEvent.requestPermission();
+        if (permissionState === 'granted') {
+          window.addEventListener('deviceorientation', handleOrientation);
+          setPermissionGranted(true);
+        } else {
+          console.warn('Device orientation permission denied.');
+          setPermissionGranted(false);
+        }
+      } catch (error) {
+        console.error('Error requesting device orientation permission:', error);
+        setPermissionGranted(false);
+      }
+    } else {
+      // For browsers that don't require permission (e.g., Android Chrome, older iOS)
+      window.addEventListener('deviceorientation', handleOrientation);
+      setPermissionGranted(true);
+    }
+  }, [handleOrientation, setPermissionGranted]); // Dependencies for useCallback
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -20,7 +51,7 @@ const BeerAnimation = () => {
       if (animationFrameId.current) {
         window.cancelAnimationFrame(animationFrameId.current);
       }
-      animationFrameId.current = window.requestAnimationFrame(draw);
+      init(); // Call init after resize
     };
 
     const init = () => {
@@ -94,42 +125,12 @@ const BeerAnimation = () => {
       if (100 * Math.PI <= c) c = 0; // Reset counter
     };
 
-    const handleOrientation = (event) => {
-      const gamma = event.gamma; // Left-to-right tilt
-      const beta = event.beta;   // Front-to-back tilt
-
-      // console.log('Tilt X (gamma):', gamma, 'Tilt Y (beta):', beta); // Debugging tilt values
-
-      setTiltX(gamma);
-      setTiltY(beta);
-    };
-
-    const requestDeviceOrientationPermission = async () => {
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        try {
-          const permissionState = await DeviceOrientationEvent.requestPermission();
-          if (permissionState === 'granted') {
-            window.addEventListener('deviceorientation', handleOrientation);
-            setPermissionGranted(true);
-          } else {
-            console.warn('Device orientation permission denied.');
-            setPermissionGranted(false);
-          }
-        } catch (error) {
-          console.error('Error requesting device orientation permission:', error);
-          setPermissionGranted(false);
-        }
-      } else {
-        window.addEventListener('deviceorientation', handleOrientation);
-        setPermissionGranted(true);
-      }
-    };
-
+    // Initial setup
     window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    resizeCanvas(); // Initial call to set w, h and start animation
 
     if (window.DeviceOrientationEvent) {
-      requestDeviceOrientationPermission();
+      requestDeviceOrientationPermission(); // Call the memoized function
     } else {
       console.warn('DeviceOrientationEvent not supported on this browser.');
       setPermissionGranted(false);
@@ -144,7 +145,7 @@ const BeerAnimation = () => {
         window.cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [level, permissionGranted]);
+  }, [level, permissionGranted, requestDeviceOrientationPermission, handleOrientation, tiltX]); // Add tiltX to dependencies
 
   return (
     <>
