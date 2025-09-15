@@ -7,12 +7,12 @@ const BeerAnimation = () => {
   const [tiltX, setTiltX] = useState(0); // For left-right tilt (gamma)
   const [permissionGranted, setPermissionGranted] = useState(false); // New state for permission
 
+  // Use useRef for particles to persist across renders without causing re-renders
+  const particlesRef = useRef([]); // RE-INTRODUCED
+
   // Device orientation handler
   const handleOrientation = useCallback((event) => {
     const gamma = event.gamma; // Left-to-right tilt
-
-    // console.log('Tilt X (gamma):', gamma, 'Tilt Y (beta):', event.beta); // Debugging tilt values
-
     setTiltX(gamma);
   }, []);
 
@@ -45,17 +45,33 @@ const BeerAnimation = () => {
     let w, h;
     let c = 0; // Animation counter for wave
 
+    // Particle object constructor (RE-INTRODUCED)
+    function particle(x, y, d) {
+      this.x = x;
+      this.y = y;
+      this.d = d;
+      this.respawn = function() {
+        const baseLiquidY = h - (h - 100) * level / 100 - 50;
+        this.x = Math.random() * w; // Random X across full width
+        this.y = baseLiquidY + Math.random() * (h - baseLiquidY); // Start between liquid surface and bottom
+        this.d = Math.random() * 5 + 5;
+      };
+    }
+
     const resizeCanvas = () => {
       w = canvas.width = window.innerWidth;
       h = canvas.height = window.innerHeight;
-      if (animationFrameId.current) {
-        window.cancelAnimationFrame(animationFrameId.current);
-      }
-      init(); // Call init after resize
+      init();
     };
 
     const init = () => {
       c = 0;
+      particlesRef.current = []; // Use particlesRef.current
+      for (let i = 0; i < 40; i++) {
+        const obj = new particle(0, 0, 0);
+        obj.respawn();
+        particlesRef.current.push(obj);
+      }
       if (animationFrameId.current) {
         window.cancelAnimationFrame(animationFrameId.current);
       }
@@ -73,7 +89,7 @@ const BeerAnimation = () => {
       ctx.translate(-w / 2, -h / 2); // Move origin back
 
       const liquidColor = "#f9a825"; // Beer color
-      const foamColor = "rgba(255, 255, 255, 0.8)"; // Foam color
+      const bubbleColor = "rgba(255, 255, 255, 0.8)"; // Bubbles color
 
       // Calculate liquid surface based on level (now fixed)
       const baseLiquidY = h - (h - 100) * level / 100 - 50; // Adjusted for fuller look
@@ -95,7 +111,7 @@ const BeerAnimation = () => {
       ctx.fill();
 
       // Draw the foam layer (RE-INTRODUCED and thickened)
-      ctx.fillStyle = foamColor;
+      ctx.fillStyle = bubbleColor; // Using bubbleColor for foam
       ctx.beginPath();
       const foamOffset = 50; // MUCH thicker foam
       ctx.moveTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency) - foamOffset);
@@ -111,6 +127,14 @@ const BeerAnimation = () => {
 
       ctx.restore(); // Restore the un-rotated state
 
+      // Draw the bubbles (RE-INTRODUCED, now filled circles, drawn relative to UN-ROTATED screen)
+      ctx.fillStyle = bubbleColor; // Bubbles are foam-colored and filled
+      for (let i = 0; i < 40; i++) {
+        ctx.beginPath();
+        ctx.arc(particlesRef.current[i].x, particlesRef.current[i].y, particlesRef.current[i].d, 0, 2 * Math.PI);
+        ctx.fill(); // Filled bubbles
+      }
+
       update();
       animationFrameId.current = window.requestAnimationFrame(draw);
     };
@@ -118,6 +142,12 @@ const BeerAnimation = () => {
     const update = () => {
       c++;
       if (100 * Math.PI <= c) c = 0; // Reset counter
+      for (let i = 0; i < 40; i++) {
+        particlesRef.current[i].x = particlesRef.current[i].x + Math.random() * 2 - 1; // Use particlesRef.current
+        particlesRef.current[i].y = particlesRef.current[i].y - 1; // Use particlesRef.current
+        particlesRef.current[i].d = particlesRef.current[i].d - 0.04; // Use particlesRef.current
+        if (particlesRef.current[i].d <= 0) particlesRef.current[i].respawn(); // Use particlesRef.current
+      }
     };
 
     // Initial setup
