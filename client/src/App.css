@@ -554,7 +554,8 @@ th, td {
 
 .back-button-global:hover {
   background-color: rgba(0, 0, 0, 0.1);
-  border-color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 0, 0, 0.1); /* Fix: Keep border color the same */
+  transform: translateY(-50%); /* Fix: Prevent vertical shift from generic button styles */
 }
 
 .App-header {
@@ -565,12 +566,17 @@ th, td {
 .event-header-with-actions {
   position: relative;
   text-align: center;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .event-header-with-actions h1 {
   overflow-wrap: break-word;
   white-space: normal;
   word-break: break-all; /* More aggressive word breaking if needed */
+  margin: 0 50px; /* Add margin to prevent overlap */
 }
 
 /* Results Table Column Widths */
@@ -640,8 +646,9 @@ th, td {
 
 .event-actions-top-right {
   position: absolute;
-  top: 30px;
-  right: 30px;
+  top: 50%; /* Fix: Align vertically with back button */
+  right: 0; /* Fix: Move to the edge */
+  transform: translateY(-50%); /* Fix: Center vertically */
   display: flex;
   gap: 10px;
 }
@@ -704,13 +711,14 @@ th, td {
   .event-header-with-actions {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center; /* Fix: Center title horizontally */
     gap: 10px;
   }
 
   .event-header-with-actions h1 {
     padding-right: 0; /* Remove padding for icons */
-    text-align: left;
+    text-align: center; /* Fix: Center title text */
+    margin: 0;
   }
 
   .event-actions-top-right {
