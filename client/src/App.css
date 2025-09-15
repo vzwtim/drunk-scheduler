@@ -10,7 +10,7 @@
   background-color: var(--background-color);
   padding: 20px;
   position: relative; /* For positioning the bubbles container */
-  overflow: hidden; /* Hide bubbles that go outside the screen */
+  /* overflow: hidden; Removed to allow beer animation to extend */
 }
 
 .App-header {
@@ -53,6 +53,8 @@ main {
   max-width: 1000px; /* Constrain main content width */
   margin-bottom: 30px; /* Adjusted vertical spacing */
   box-sizing: border-box; /* Ensure padding is included in width */
+  position: relative; /* Ensure z-index works */
+  z-index: 2; /* Place above bubbles and beer */
 }
 
 h2 {
@@ -743,7 +745,7 @@ th, td {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0; /* Place behind content */
+  z-index: 1; /* Place above beer animation, behind content */
   pointer-events: none; /* Make sure it doesn't interfere with clicks */
 }
 
@@ -914,3 +916,41 @@ th, td {
 .results-container thead th:first-child {
   z-index: 3; /* Must be on top of both header row and first column */
 }
+
+/* Beer Slosh Animation */
+.beer-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0; /* Behind bubbles and content */
+  pointer-events: none;
+  overflow: hidden; /* The container itself should hide the overflow */
+}
+
+.beer-liquid {
+  position: absolute;
+  bottom: -140%; /* Adjust to control initial 'fill' level */
+  left: 50%;
+  width: 250vw;
+  height: 250vw;
+  background: #f9a825; /* A nice beer color */
+  border-radius: 40%;
+  /* The transform is now handled by the JS component */
+  transition: transform 0.5s ease-out;
+  opacity: 0.9;
+}
+
+.beer-liquid .beer-foam {
+  content: '';
+  position: absolute;
+  top: 2%; /* Position foam at the top of the liquid */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 10%; /* Foam height */
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+}
+

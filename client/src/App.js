@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate, Link } from 'react
 import EventSetup from './components/EventSetup';
 import EventList from './components/EventList';
 import EventPage from './components/EventPage';
+import BeerAnimation from './components/BeerAnimation';
 import './App.css';
 
 // AppContent contains the logic that needs access to the navigate function.
@@ -16,6 +17,7 @@ function AppContent() {
 
   return (
     <div className="App">
+      <BeerAnimation />
       <div className="bubbles-container">
         {[...Array(15)].map((_, i) => <div className="bubble" key={i} />)}
       </div>
