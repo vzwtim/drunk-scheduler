@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 const BeerAnimation = () => {
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
-  const [level, setLevel] = useState(50); // Initial liquid level (0-100)
+  const [level] = useState(50); // Initial liquid level (0-100), now fixed
   const [tiltX, setTiltX] = useState(0); // For left-right tilt (gamma)
   const [tiltY, setTiltY] = useState(0); // For front-to-back tilt (beta)
 
@@ -20,10 +20,9 @@ const BeerAnimation = () => {
       this.y = y;
       this.d = d;
       this.respawn = function() {
-        // Respawn particles within the liquid area
-        const liquidTop = h - (h - 100) * level / 100 - 50;
-        this.x = Math.random() * (w * 0.8) + (0.1 * w);
-        this.y = Math.random() * (h - liquidTop) + liquidTop; // Respawn within liquid
+        // Respawn particles from the bottom of the canvas
+        this.x = Math.random() * w; // Random X across full width
+        this.y = h + Math.random() * 20; // Start below the canvas, with some randomness
         this.d = Math.random() * 5 + 5;
       };
     }
@@ -57,10 +56,10 @@ const BeerAnimation = () => {
 
       // Calculate liquid surface based on level and tilt
       const baseLiquidY = h - (h - 100) * level / 100 - 50; // Adjusted for fuller look
-      const waveAmplitude = 15; // Max wave height
+      const waveAmplitude = 8; // Reduced wave height for less wildness
       const waveFrequency = 0.05; // How fast the wave oscillates
-      const tiltInfluenceX = tiltX * 0.5; // Tilt influences wave position
-      const tiltInfluenceY = tiltY * 0.5; // Tilt influences overall liquid height
+      const tiltInfluenceX = tiltX * 0.2; // Reduced tilt influence
+      const tiltInfluenceY = tiltY * 0.2; // Reduced tilt influence
 
       // Draw the liquid
       ctx.fillStyle = liquidColor;
@@ -120,15 +119,8 @@ const BeerAnimation = () => {
       const gamma = event.gamma; // Left-to-right tilt
       const beta = event.beta;   // Front-to-back tilt
 
-      // Spilling logic
-      const spillThreshold = 70; // Degrees
-      if (Math.abs(gamma) > spillThreshold || Math.abs(beta) > spillThreshold) {
-        // Reduce level if spilling
-        setLevel(prevLevel => Math.max(0, prevLevel - 0.5)); // Gradual reduction
-      } else {
-        // Gradually restore level if not spilling and below max
-        setLevel(prevLevel => Math.min(50, prevLevel + 0.1)); // Restore to 50
-      }
+      // Spilling logic (no automatic level change)
+      // The level is now fixed at 50, but tilt still influences wave
 
       setTiltX(gamma); // Use raw gamma for wave effect
       setTiltY(beta);  // Use raw beta for wave effect
