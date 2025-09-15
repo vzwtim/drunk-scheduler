@@ -7,6 +7,9 @@ const BeerAnimation = () => {
   const [tiltX, setTiltX] = useState(0); // For left-right tilt (gamma)
   const [permissionGranted, setPermissionGranted] = useState(false); // New state for permission
 
+  // Use useRef for particles to persist across renders without causing re-renders
+  const particlesRef = useRef([]); // Declare particles using useRef
+
   // Device orientation handler
   const handleOrientation = useCallback((event) => {
     const gamma = event.gamma; // Left-to-right tilt
@@ -33,6 +36,7 @@ const BeerAnimation = () => {
         setPermissionGranted(false);
       }
     } else {
+      // This branch is for browsers that support DeviceOrientationEvent but don't require explicit permission (e.g., Android Chrome)
       window.addEventListener('deviceorientation', handleOrientation);
       setPermissionGranted(true);
     }
@@ -42,16 +46,14 @@ const BeerAnimation = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     let w, h;
-    let particles = []; // RE-INTRODUCED
     let c = 0; // Animation counter for wave
 
-    // Particle object constructor (RE-INTRODUCED)
+    // Particle object constructor (moved inside useEffect to access w, h, level)
     function particle(x, y, d) {
       this.x = x;
       this.y = y;
       this.d = d;
       this.respawn = function() {
-        // Respawn particles from below the liquid surface
         const baseLiquidY = h - (h - 100) * level / 100 - 50;
         this.x = Math.random() * w; // Random X across full width
         this.y = baseLiquidY + Math.random() * (h - baseLiquidY); // Start between liquid surface and bottom
@@ -62,17 +64,16 @@ const BeerAnimation = () => {
     const resizeCanvas = () => {
       w = canvas.width = window.innerWidth;
       h = canvas.height = window.innerHeight;
-      init(); // Re-initialize particles on resize
+      init();
     };
 
-    // Function to start or restart the animation (RE-INTRODUCED particle init)
     const init = () => {
       c = 0;
-      particles = []; // RE-INTRODUCED
-      for (let i = 0; i < 40; i++) { // RE-INTRODUCED
-        const obj = new particle(0, 0, 0); // RE-INTRODUCED
-        obj.respawn(); // RE-INTRODUCED
-        particles.push(obj); // RE-INTRODUCED
+      particlesRef.current = []; // Use particlesRef.current
+      for (let i = 0; i < 40; i++) {
+        const obj = new particle(0, 0, 0);
+        obj.respawn();
+        particlesRef.current.push(obj);
       }
       if (animationFrameId.current) {
         window.cancelAnimationFrame(animationFrameId.current);
@@ -93,8 +94,6 @@ const BeerAnimation = () => {
       const liquidColor = "#f9a825"; // Beer color
       const foamColor = "rgba(255, 255, 255, 0.8)"; // Bubbles color
 
-      // --- Background fill removed as per user request ---
-
       // Calculate liquid surface based on level (now fixed)
       const baseLiquidY = h - (h - 100) * level / 100 - 50; // Adjusted for fuller look
       const waveAmplitude = 32; // Increased wave height for thicker surface
@@ -114,13 +113,11 @@ const BeerAnimation = () => {
       ctx.closePath();
       ctx.fill();
 
-      // --- Foam drawing logic removed as per user request ---
-
-      // Draw the bubbles (RE-INTRODUCED, now filled circles, drawn relative to rotated screen)
+      // Draw the bubbles
       ctx.fillStyle = foamColor; // Bubbles are foam-colored and filled
       for (let i = 0; i < 40; i++) {
         ctx.beginPath();
-        ctx.arc(particles[i].x, particles[i].y, particles[i].d, 0, 2 * Math.PI);
+        ctx.arc(particlesRef.current[i].x, particlesRef.current[i].y, particlesRef.current[i].d, 0, 2 * Math.PI); // Use particlesRef.current
         ctx.fill(); // Filled bubbles
       }
 
@@ -130,36 +127,33 @@ const BeerAnimation = () => {
       animationFrameId.current = window.requestAnimationFrame(draw);
     };
 
-    // Function that updates variables (RE-INTRODUCED particle update)
     const update = () => {
       c++;
       if (100 * Math.PI <= c) c = 0; // Reset counter
-      for (let i = 0; i < 40; i++) { // RE-INTRODUCED
-        particles[i].x = particles[i].x + Math.random() * 2 - 1; // RE-INTRODUCED
-        particles[i].y = particles[i].y - 1; // RE-INTRODUCED
-        particles[i].d = particles[i].d - 0.04; // RE-INTRODUCED
-        if (particles[i].d <= 0) particles[i].respawn(); // RE-INTRODUCED
+      for (let i = 0; i < 40; i++) {
+        particlesRef.current[i].x = particlesRef.current[i].x + Math.random() * 2 - 1; // Use particlesRef.current
+        particlesRef.current[i].y = particlesRef.current[i].y - 1; // Use particlesRef.current
+        particlesRef.current[i].d = particlesRef.current[i].d - 0.04; // Use particlesRef.current
+        if (particlesRef.current[i].d <= 0) particlesRef.current[i].respawn(); // Use particlesRef.current
       }
     };
 
-    // Device orientation handler
-    const handleOrientation = (event) => {
-      const gamma = event.gamma; // Left-to-right tilt
-
-      // console.log('Tilt X (gamma):', gamma, 'Tilt Y (beta):', event.beta); // Debugging tilt values
-
-      setTiltX(gamma);
-    };
+    // Initial setup
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas(); // Initial call to set w, h and start animation
 
     if (window.DeviceOrientationEvent) {
-      requestDeviceOrientationPermission(); // Call the memoized function
+      // If permission function exists, we'll rely on the button click.
+      // If not, but API is supported, add listener directly.
+      if (typeof DeviceOrientationEvent.requestPermission !== 'function') {
+        window.addEventListener('deviceorientation', handleOrientation);
+        setPermissionGranted(true); // Assume granted if no explicit request needed
+      }
+      // If requestPermission function exists, the button will handle calling requestDeviceOrientationPermission
     } else {
       console.warn('DeviceOrientationEvent not supported on this browser.');
       setPermissionGranted(false);
     }
-
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas(); // Initial call to set w, h and start animation
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
