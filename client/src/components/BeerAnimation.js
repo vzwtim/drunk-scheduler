@@ -113,12 +113,11 @@ const BeerAnimation = () => {
       // Draw the liquid (now drawn relative to the rotated context)
       ctx.fillStyle = liquidColor; // Ensure fillStyle is liquidColor for the main liquid shape
       ctx.beginPath();
-      ctx.moveTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX)); // ADD tiltInfluenceX
-      ctx.bezierCurveTo(
-        w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI / 2 + tiltInfluenceX),
-        2 * w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI + tiltInfluenceX),
-        w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2 + tiltInfluenceX)
-      );
+      const startY = baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX);
+      const endY = baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI + tiltInfluenceX);
+      const controlY = baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI / 2 + tiltInfluenceX);
+      ctx.moveTo(0, startY);
+      ctx.quadraticCurveTo(w / 2, controlY, w, endY);
       ctx.lineTo(w, h * 1.5); // Extend liquid bottom beyond canvas
       ctx.lineTo(0, h * 1.5); // Extend liquid bottom beyond canvas
       ctx.closePath();
@@ -128,14 +127,10 @@ const BeerAnimation = () => {
       ctx.fillStyle = bubbleColor; // Using bubbleColor for foam
       ctx.beginPath();
       const foamOffset = 50; // MUCH thicker foam
-      ctx.moveTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX) - foamOffset);
-      ctx.bezierCurveTo(
-        w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI / 2 + tiltInfluenceX) - foamOffset,
-        2 * w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI + tiltInfluenceX) - foamOffset,
-        w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2 + tiltInfluenceX) - foamOffset
-      );
-      ctx.lineTo(w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2 + tiltInfluenceX));
-      ctx.lineTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX));
+      ctx.moveTo(0, startY - foamOffset);
+      ctx.quadraticCurveTo(w / 2, controlY - foamOffset, w, endY - foamOffset);
+      ctx.lineTo(w, endY);
+      ctx.lineTo(0, startY);
       ctx.closePath();
       ctx.fill();
 
