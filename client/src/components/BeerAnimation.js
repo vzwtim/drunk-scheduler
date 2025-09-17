@@ -35,7 +35,7 @@ const BeerAnimation = () => {
       try {
         const permissionState = await DeviceOrientationEvent.requestPermission();
         if (permissionState === 'granted') {
-          window.addEventListener('deviceorientation', handleOrientation);
+          // window.addEventListener('deviceorientation', handleOrientation);
           setPermissionGranted(true);
         } else {
           console.warn('Device orientation permission denied.');
@@ -47,7 +47,7 @@ const BeerAnimation = () => {
       }
     } else {
       // This branch is for browsers that support DeviceOrientationEvent but don't require explicit permission (e.g., Android Chrome)
-      window.addEventListener('deviceorientation', handleOrientation);
+      // window.addEventListener('deviceorientation', handleOrientation);
       setPermissionGranted(true);
     }
   }, [handleOrientation, setPermissionGranted]);
@@ -194,23 +194,6 @@ const BeerAnimation = () => {
 
   return (
     <>
-      {!permissionGranted && window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function' && (
-        <button
-          onClick={requestDeviceOrientationPermission}
-          style={{
-            position: 'fixed',
-            top: '10px',
-            left: '10px',
-            zIndex: 1000,
-            padding: '10px',
-            backgroundColor: 'white',
-            border: '1px solid black',
-            cursor: 'pointer',
-          }}
-        >
-          センサーを有効にする
-        </button>
-      )}
       <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, zIndex: 0 }} />
     </>
   );
