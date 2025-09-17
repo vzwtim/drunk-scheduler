@@ -6,7 +6,11 @@
   --sub-accent-color: #6B8E23; /* OliveDrab - Green accent */
   --dark-charcoal: #4A2C00; /* Very dark brown for strong elements */
   --white: #FFFFFF;
-  --background-color: #FFF8DC; /* Cornsilk - Creamy foam background */
+  --background-color: #FFEBCD; /* BlanchedAlmond - Creamy foam background */
+}
+
+html, body, #root {
+  height: 100%;
 }
 
 body {
