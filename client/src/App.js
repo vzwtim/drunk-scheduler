@@ -4,7 +4,7 @@ import EventSetup from './components/EventSetup';
 import EventList from './components/EventList';
 import EventPage from './components/EventPage';
 import BeerAnimation from './components/BeerAnimation';
-import SpiritLevel from './components/SpiritLevel'; // Import SpiritLevel
+
 import './App.css';
 
 // AppContent contains the logic that needs access to the navigate function.
@@ -18,7 +18,7 @@ function AppContent() {
 
   return (
     <div className="App">
-      <SpiritLevel /> {/* Add SpiritLevel component */}
+      
       <BeerAnimation />
       
       <header className="App-header">
