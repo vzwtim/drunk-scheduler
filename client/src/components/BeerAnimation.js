@@ -6,14 +6,27 @@ const BeerAnimation = () => {
   const [level] = useState(50); // Initial liquid level (0-100), now fixed
   const [tiltX, setTiltX] = useState(0); // For left-right tilt (gamma)
   const [permissionGranted, setPermissionGranted] = useState(false); // New state for permission
+  const gammaValues = useRef([]); // To store recent gamma values for smoothing
 
   // Use useRef for particles to persist across renders without causing re-renders
   const particlesRef = useRef([]); // RE-INTRODUCED
 
-  // Device orientation handler
+  // Device orientation handler with smoothing
   const handleOrientation = useCallback((event) => {
-    const gamma = event.gamma; // Left-to-right tilt
-    setTiltX(gamma);
+    const gamma = event.gamma; // Left-to-right tilt (-90 to 90)
+
+    // Add the new gamma value to the array
+    gammaValues.current.push(gamma);
+
+    // Keep only the last 10 values for a moving average
+    if (gammaValues.current.length > 10) {
+      gammaValues.current.shift();
+    }
+
+    // Calculate the average of the gamma values
+    const smoothedGamma = gammaValues.current.reduce((acc, val) => acc + val, 0) / gammaValues.current.length;
+
+    setTiltX(smoothedGamma);
   }, []);
 
   // Define requestDeviceOrientationPermission outside useEffect
@@ -85,7 +98,7 @@ const BeerAnimation = () => {
       ctx.save(); // Save the un-rotated state
       ctx.translate(w / 2, h / 2); // Move origin to center of canvas
       // Reduce sensitivity of tiltX
-      ctx.rotate(-tiltX * 0.5 * Math.PI / 180); // Counter-rotate for left-right tilt, FURTHER reduced sensitivity
+      // ctx.rotate(-tiltX * 0.5 * Math.PI / 180); // REMOVED THIS LINE
       ctx.translate(-w / 2, -h / 2); // Move origin back
 
       const liquidColor = "#f9a825"; // Beer color
@@ -95,15 +108,16 @@ const BeerAnimation = () => {
       const baseLiquidY = h - (h - 100) * level / 100 - 50; // Adjusted for fuller look
       const waveAmplitude = 32; // Increased wave height for thicker surface
       const waveFrequency = 0.05; // How fast the wave oscillates
+      const tiltInfluenceX = -tiltX * 0.5; // RE-INTRODUCED and REVERSED direction
 
       // Draw the liquid (now drawn relative to the rotated context)
       ctx.fillStyle = liquidColor; // Ensure fillStyle is liquidColor for the main liquid shape
       ctx.beginPath();
-      ctx.moveTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency));
+      ctx.moveTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX)); // ADD tiltInfluenceX
       ctx.bezierCurveTo(
-        w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI / 2),
-        2 * w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI),
-        w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2)
+        w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI / 2 + tiltInfluenceX),
+        2 * w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI + tiltInfluenceX),
+        w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2 + tiltInfluenceX)
       );
       ctx.lineTo(w, h * 1.5); // Extend liquid bottom beyond canvas
       ctx.lineTo(0, h * 1.5); // Extend liquid bottom beyond canvas
@@ -114,14 +128,14 @@ const BeerAnimation = () => {
       ctx.fillStyle = bubbleColor; // Using bubbleColor for foam
       ctx.beginPath();
       const foamOffset = 50; // MUCH thicker foam
-      ctx.moveTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency) - foamOffset);
+      ctx.moveTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX) - foamOffset);
       ctx.bezierCurveTo(
-        w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI / 2) - foamOffset,
-        2 * w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI) - foamOffset,
-        w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2) - foamOffset
+        w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI / 2 + tiltInfluenceX) - foamOffset,
+        2 * w / 3, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI + tiltInfluenceX) - foamOffset,
+        w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2 + tiltInfluenceX) - foamOffset
       );
-      ctx.lineTo(w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2));
-      ctx.lineTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency));
+      ctx.lineTo(w, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + 3 * Math.PI / 2 + tiltInfluenceX));
+      ctx.lineTo(0, baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX));
       ctx.closePath();
       ctx.fill();
 
@@ -131,7 +145,7 @@ const BeerAnimation = () => {
       ctx.fillStyle = bubbleColor; // Bubbles are foam-colored and filled
       for (let i = 0; i < 40; i++) {
         ctx.beginPath();
-        ctx.arc(particlesRef.current[i].x, particlesRef.current[i].y, particlesRef.current[i].d, 0, 2 * Math.PI);
+        ctx.arc(particlesRef.current[i].x, particlesRef.current[i].y, particlesRef.current[i].d, 0, 2 * Math.PI); // Use particlesRef.current
         ctx.fill(); // Filled bubbles
       }
 

@@ -18,9 +18,7 @@ function AppContent() {
   return (
     <div className="App">
       <BeerAnimation />
-      <div className="bubbles-container">
-        {[...Array(15)].map((_, i) => <div className="bubble" key={i} />)}
-      </div>
+      
       <header className="App-header">
         <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
           <h1>🍻Drunk Scheduler🍻</h1>
