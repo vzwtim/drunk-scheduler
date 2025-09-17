@@ -24,7 +24,7 @@ const SpiritLevel = () => {
     const relativeGamma = event.gamma - initialGamma.current;
 
     // Set the target for the animation loop. The negative value counteracts the tilt.
-    targetRotation.current = -relativeGamma;
+    targetRotation.current = relativeGamma;
   }, []);
 
   const requestSensorPermission = () => {
