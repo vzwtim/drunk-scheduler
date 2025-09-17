@@ -4,80 +4,77 @@ import './SpiritLevel.css';
 const SpiritLevel = () => {
   const [rotation, setRotation] = useState(0);
   const [sensorAccess, setSensorAccess] = useState('idle');
-  const [debugLog, setDebugLog] = useState([]);
 
   const targetRotation = useRef(0);
-  const filterAlpha = 0.9;
+  const initialGamma = useRef(null); // To store the initial sensor value for baseline correction
+  const filterAlpha = 0.9; // Smoothing factor for the low-pass filter. 0 = no smoothing, 0.99 = very smooth.
 
-  const addLog = (message) => {
-    setDebugLog(prev => [...prev.slice(-4), `${new Date().toLocaleTimeString()}: ${message}`]);
-  };
-
-  const handleDeviceMotion = useCallback((event) => {
-    const acceleration = event.accelerationIncludingGravity;
-    if (acceleration && acceleration.x !== null && acceleration.z !== null) {
-      const roll = Math.atan2(acceleration.x, acceleration.z);
-      const rollDegrees = roll * (180 / Math.PI);
-      targetRotation.current = -rollDegrees;
-      addLog(`[Sensor] Target: ${targetRotation.current.toFixed(2)}`);
+  const handleOrientation = useCallback((event) => {
+    // event.gamma provides the left-to-right tilt in degrees, ranging from -90 to 90
+    if (event.gamma === null) {
+      return; // Exit if sensor data is not available
     }
+
+    // On the first run, capture the initial gamma value to use as a baseline (zero point).
+    if (initialGamma.current === null) {
+      initialGamma.current = event.gamma;
+    }
+
+    // Calculate the relative tilt by subtracting the baseline.
+    const relativeGamma = event.gamma - initialGamma.current;
+
+    // Set the target for the animation loop. The negative value counteracts the tilt.
+    targetRotation.current = -relativeGamma;
   }, []);
 
   const requestSensorPermission = () => {
-    addLog('Requesting permission...');
-    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    // iOS 13+ requires user permission for device orientation events.
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
       setSensorAccess('requested');
-      DeviceMotionEvent.requestPermission()
+      DeviceOrientationEvent.requestPermission()
         .then(permissionState => {
           if (permissionState === 'granted') {
-            addLog('Permission granted!');
-            setSensorAccess('granted'); // State change will trigger useEffect
+            setSensorAccess('granted');
           } else {
-            addLog('Permission denied.');
             setSensorAccess('denied');
           }
         })
-        .catch(error => {
-          addLog(`Permission error: ${error.message}`);
-          setSensorAccess('denied');
-        });
+        .catch(() => setSensorAccess('denied'));
     } else {
-      addLog('No permission needed.');
-      setSensorAccess('granted'); // State change will trigger useEffect
+      // For other browsers/devices, permission is not required.
+      setSensorAccess('granted');
     }
   };
 
   useEffect(() => {
     let animationFrameId;
+
+    // Animation loop to smoothly interpolate to the target rotation
     const updateRotation = () => {
       setRotation(prevRotation => prevRotation * filterAlpha + targetRotation.current * (1 - filterAlpha));
       animationFrameId = requestAnimationFrame(updateRotation);
     };
 
     if (sensorAccess === 'granted') {
-      addLog('[Effect] Granted: Adding listener and starting loop.');
-      window.addEventListener('devicemotion', handleDeviceMotion);
+      window.addEventListener('deviceorientation', handleOrientation);
       animationFrameId = requestAnimationFrame(updateRotation);
     }
 
-    // Cleanup function runs when component unmounts or sensorAccess changes
+    // Cleanup function to remove listener and cancel animation frame
     return () => {
-      // No need to check sensorAccess here, this cleanup is tied to the effect
-      // that runs only when granted. But to be safe, we can check if listener was added.
-      addLog('[Effect] Cleaning up listener and animation.');
-      window.removeEventListener('devicemotion', handleDeviceMotion);
+      window.removeEventListener('deviceorientation', handleOrientation);
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [sensorAccess, handleDeviceMotion]); // Re-run effect if sensorAccess changes
+  }, [sensorAccess, handleOrientation]);
 
   const renderContent = () => {
     switch (sensorAccess) {
       case 'granted':
         return <div className="spirit-level-line" style={{ transform: `rotate(${rotation}deg)` }}></div>;
       case 'denied':
-        return <p className="permission-text">Sensor access was denied.</p>;
+        return <p className="permission-text">Sensor access was denied. Please enable it in your browser settings.</p>;
       case 'requested':
         return <p className="permission-text">Requesting sensor access...</p>;
       case 'idle':
@@ -87,10 +84,9 @@ const SpiritLevel = () => {
   };
 
   return (
-    <>
-      <div className="spirit-level-container">{renderContent()}</div>
-      <pre className="debug-log">{debugLog.join('\n')}</pre>
-    </>
+    <div className="spirit-level-container">
+      {renderContent()}
+    </div>
   );
 };
 
