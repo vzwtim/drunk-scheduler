@@ -9,7 +9,7 @@ const SpiritLevel = () => {
       // We'll use the 'gamma' value for left-to-right tilt.
       // The range is -90 to 90.
       const gamma = event.gamma;
-      setRotation(gamma);
+      setRotation(-gamma);
     };
 
     window.addEventListener('deviceorientation', handleOrientation);
