@@ -4,53 +4,9 @@ const BeerAnimation = () => {
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
   const [level] = useState(50); // Initial liquid level (0-100), now fixed
-  const [tiltX, setTiltX] = useState(0); // For left-right tilt (gamma)
-  const [permissionGranted, setPermissionGranted] = useState(false); // New state for permission
-  const gammaValues = useRef([]); // To store recent gamma values for smoothing
 
   // Use useRef for particles to persist across renders without causing re-renders
   const particlesRef = useRef([]); // RE-INTRODUCED
-
-  // Device orientation handler with smoothing
-  const handleOrientation = useCallback((event) => {
-    const gamma = event.gamma; // Left-to-right tilt (-90 to 90)
-
-    // Add the new gamma value to the array
-    gammaValues.current.push(gamma);
-
-    // Keep only the last 10 values for a moving average
-    if (gammaValues.current.length > 10) {
-      gammaValues.current.shift();
-    }
-
-    // Calculate the average of the gamma values
-    const smoothedGamma = gammaValues.current.reduce((acc, val) => acc + val, 0) / gammaValues.current.length;
-
-    setTiltX(smoothedGamma);
-  }, []);
-
-  // Define requestDeviceOrientationPermission outside useEffect
-  const requestDeviceOrientationPermission = useCallback(async () => {
-    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      try {
-        const permissionState = await DeviceOrientationEvent.requestPermission();
-        if (permissionState === 'granted') {
-          // window.addEventListener('deviceorientation', handleOrientation);
-          setPermissionGranted(true);
-        } else {
-          console.warn('Device orientation permission denied.');
-          setPermissionGranted(false);
-        }
-      } catch (error) {
-        console.error('Error requesting device orientation permission:', error);
-        setPermissionGranted(false);
-      }
-    } else {
-      // This branch is for browsers that support DeviceOrientationEvent but don't require explicit permission (e.g., Android Chrome)
-      // window.addEventListener('deviceorientation', handleOrientation);
-      setPermissionGranted(true);
-    }
-  }, [handleOrientation, setPermissionGranted]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -108,14 +64,13 @@ const BeerAnimation = () => {
       const baseLiquidY = h - (h - 100) * level / 100 - 50; // Adjusted for fuller look
       const waveAmplitude = 32; // Increased wave height for thicker surface
       const waveFrequency = 0.05; // How fast the wave oscillates
-      const tiltInfluenceX = -tiltX * 0.5; // RE-INTRODUCED and REVERSED direction
 
       // Draw the liquid (now drawn relative to the rotated context)
       ctx.fillStyle = liquidColor; // Ensure fillStyle is liquidColor for the main liquid shape
       ctx.beginPath();
-      const startY = baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + tiltInfluenceX);
-      const endY = baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI + tiltInfluenceX);
-      const controlY = baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI / 2 + tiltInfluenceX);
+      const startY = baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency);
+      const endY = baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI);
+      const controlY = baseLiquidY + waveAmplitude * Math.sin(c * waveFrequency + Math.PI / 2);
       ctx.moveTo(0, startY);
       ctx.quadraticCurveTo(w / 2, controlY, w, endY);
       ctx.lineTo(w, h * 1.5); // Extend liquid bottom beyond canvas
@@ -163,29 +118,13 @@ const BeerAnimation = () => {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas(); // Initial call to set w, h and start animation
 
-    if (window.DeviceOrientationEvent) {
-      // If permission function exists, we'll rely on the button click.
-      // If not, but API is supported, add listener directly.
-      if (typeof DeviceOrientationEvent.requestPermission !== 'function') {
-        window.addEventListener('deviceorientation', handleOrientation);
-        setPermissionGranted(true); // Assume granted if no explicit request needed
-      }
-      // If requestPermission function exists, the button will handle calling requestDeviceOrientationPermission
-    } else {
-      console.warn('DeviceOrientationEvent not supported on this browser.');
-      setPermissionGranted(false);
-    }
-
     return () => {
       window.removeEventListener('resize', resizeCanvas);
-      if (window.DeviceOrientationEvent && permissionGranted) {
-        window.removeEventListener('deviceorientation', handleOrientation);
-      }
       if (animationFrameId.current) {
         window.cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [level, permissionGranted, requestDeviceOrientationPermission, handleOrientation, tiltX]);
+  }, [level]);
 
   return (
     <>
