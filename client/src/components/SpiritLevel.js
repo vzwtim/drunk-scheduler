@@ -4,14 +4,12 @@ import './SpiritLevel.css';
 const SpiritLevel = () => {
   const [rotation, setRotation] = useState(0);
   const [sensorAccess, setSensorAccess] = useState('idle');
-  const [debugLog, setDebugLog] = useState([]); // State for on-screen debug log
+  const [debugLog, setDebugLog] = useState([]);
 
   const targetRotation = useRef(0);
   const filterAlpha = 0.9;
 
-  // Helper to add a log entry to the screen
   const addLog = (message) => {
-    // Keep the last 5 entries
     setDebugLog(prev => [...prev.slice(-4), `${new Date().toLocaleTimeString()}: ${message}`]);
   };
 
@@ -33,8 +31,7 @@ const SpiritLevel = () => {
         .then(permissionState => {
           if (permissionState === 'granted') {
             addLog('Permission granted!');
-            setSensorAccess('granted');
-            window.addEventListener('devicemotion', handleDeviceMotion);
+            setSensorAccess('granted'); // State change will trigger useEffect
           } else {
             addLog('Permission denied.');
             setSensorAccess('denied');
@@ -46,63 +43,53 @@ const SpiritLevel = () => {
         });
     } else {
       addLog('No permission needed.');
-      setSensorAccess('granted');
-      window.addEventListener('devicemotion', handleDeviceMotion);
+      setSensorAccess('granted'); // State change will trigger useEffect
     }
   };
 
   useEffect(() => {
     let animationFrameId;
-
     const updateRotation = () => {
-      setRotation(prevRotation => {
-        const newRotation = prevRotation * filterAlpha + targetRotation.current * (1 - filterAlpha);
-        return newRotation;
-      });
+      setRotation(prevRotation => prevRotation * filterAlpha + targetRotation.current * (1 - filterAlpha));
       animationFrameId = requestAnimationFrame(updateRotation);
     };
 
     if (sensorAccess === 'granted') {
-      addLog('[Effect] Starting animation loop.');
+      addLog('[Effect] Granted: Adding listener and starting loop.');
+      window.addEventListener('devicemotion', handleDeviceMotion);
       animationFrameId = requestAnimationFrame(updateRotation);
     }
 
+    // Cleanup function runs when component unmounts or sensorAccess changes
     return () => {
+      // No need to check sensorAccess here, this cleanup is tied to the effect
+      // that runs only when granted. But to be safe, we can check if listener was added.
+      addLog('[Effect] Cleaning up listener and animation.');
+      window.removeEventListener('devicemotion', handleDeviceMotion);
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
-      window.removeEventListener('devicemotion', handleDeviceMotion);
     };
-  }, [sensorAccess, handleDeviceMotion]);
+  }, [sensorAccess, handleDeviceMotion]); // Re-run effect if sensorAccess changes
 
   const renderContent = () => {
     switch (sensorAccess) {
       case 'granted':
-        return (
-          <div className="spirit-level-line" style={{ transform: `rotate(${rotation}deg)` }}></div>
-        );
+        return <div className="spirit-level-line" style={{ transform: `rotate(${rotation}deg)` }}></div>;
       case 'denied':
         return <p className="permission-text">Sensor access was denied.</p>;
       case 'requested':
         return <p className="permission-text">Requesting sensor access...</p>;
       case 'idle':
       default:
-        return (
-          <button onClick={requestSensorPermission} className="permission-button">
-            Activate Spirit Level
-          </button>
-        );
+        return <button onClick={requestSensorPermission} className="permission-button">Activate Spirit Level</button>;
     }
   };
 
   return (
     <>
-      <div className="spirit-level-container">
-        {renderContent()}
-      </div>
-      <pre className="debug-log">
-        {debugLog.join('\n')}
-      </pre>
+      <div className="spirit-level-container">{renderContent()}</div>
+      <pre className="debug-log">{debugLog.join('\n')}</pre>
     </>
   );
 };
