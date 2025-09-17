@@ -80,11 +80,11 @@ const BeerAnimation = () => {
     const init = () => {
       c = 0;
       particlesRef.current = []; // Use particlesRef.current
-      for (let i = 0; i < 40; i++) {
-        const obj = new particle(0, 0, 0);
-        obj.respawn();
-        particlesRef.current.push(obj);
-      }
+      // for (let i = 0; i < 40; i++) {
+      //   const obj = new particle(0, 0, 0);
+      //   obj.respawn();
+      //   particlesRef.current.push(obj);
+      // }
       if (animationFrameId.current) {
         window.cancelAnimationFrame(animationFrameId.current);
       }
@@ -142,12 +142,12 @@ const BeerAnimation = () => {
       ctx.restore(); // Restore the un-rotated state
 
       // Draw the bubbles (RE-INTRODUCED, now filled circles, drawn relative to UN-ROTATED screen)
-      ctx.fillStyle = bubbleColor; // Bubbles are foam-colored and filled
-      for (let i = 0; i < 40; i++) {
-        ctx.beginPath();
-        ctx.arc(particlesRef.current[i].x, particlesRef.current[i].y, particlesRef.current[i].d, 0, 2 * Math.PI); // Use particlesRef.current
-        ctx.fill(); // Filled bubbles
-      }
+      // ctx.fillStyle = bubbleColor; // Bubbles are foam-colored and filled
+      // for (let i = 0; i < 40; i++) {
+      //   ctx.beginPath();
+      //   ctx.arc(particlesRef.current[i].x, particlesRef.current[i].y, particlesRef.current[i].d, 0, 2 * Math.PI); // Use particlesRef.current
+      //   ctx.fill(); // Filled bubbles
+      // }
 
       update();
       animationFrameId.current = window.requestAnimationFrame(draw);
@@ -156,12 +156,12 @@ const BeerAnimation = () => {
     const update = () => {
       c++;
       if (100 * Math.PI <= c) c = 0; // Reset counter
-      for (let i = 0; i < 40; i++) {
-        particlesRef.current[i].x = particlesRef.current[i].x + Math.random() * 2 - 1; // Use particlesRef.current
-        particlesRef.current[i].y = particlesRef.current[i].y - 1; // Use particlesRef.current
-        particlesRef.current[i].d = particlesRef.current[i].d - 0.04; // Use particlesRef.current
-        if (particlesRef.current[i].d <= 0) particlesRef.current[i].respawn(); // Use particlesRef.current
-      }
+      // for (let i = 0; i < 40; i++) {
+      //   particlesRef.current[i].x = particlesRef.current[i].x + Math.random() * 2 - 1; // Use particlesRef.current
+      //   particlesRef.current[i].y = particlesRef.current[i].y - 1; // Use particlesRef.current
+      //   particlesRef.current[i].d = particlesRef.current[i].d - 0.04; // Use particlesRef.current
+      //   if (particlesRef.current[i].d <= 0) particlesRef.current[i].respawn(); // Use particlesRef.current
+      // }
     };
 
     // Initial setup
