@@ -1,22 +1,24 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './SpiritLevel.css';
 
 const SpiritLevel = () => {
   const [rotation, setRotation] = useState(0);
   const [sensorAccess, setSensorAccess] = useState('idle'); // idle, requested, granted, denied
 
+  // Ref to store the raw rotation calculated from the sensor
+  const targetRotation = useRef(0);
+
+  // Low-pass filter alpha. Closer to 1 means smoother but more lag.
+  const filterAlpha = 0.9;
+
   const handleDeviceMotion = useCallback((event) => {
     const acceleration = event.accelerationIncludingGravity;
     if (acceleration && acceleration.x !== null && acceleration.z !== null) {
-      // Calculate roll (rotation around Z-axis, which corresponds to left-right tilt)
-      // We use atan2(x, z) to get the angle in radians
       const roll = Math.atan2(acceleration.x, acceleration.z);
-      
-      // Convert radians to degrees
       const rollDegrees = roll * (180 / Math.PI);
       
-      // We set the negative value to counteract the device's tilt
-      setRotation(-rollDegrees);
+      // Update the target rotation. We set the negative value to counteract the tilt.
+      targetRotation.current = -rollDegrees;
     }
   }, []);
 
@@ -37,18 +39,33 @@ const SpiritLevel = () => {
           setSensorAccess('denied');
         });
     } else {
-      // For non-iOS 13+ devices that don't require explicit permission
       setSensorAccess('granted');
       window.addEventListener('devicemotion', handleDeviceMotion);
     }
   };
 
   useEffect(() => {
-    // Cleanup function to remove the event listener
+    let animationFrameId;
+
+    // Animation loop to smoothly update the rotation
+    const updateRotation = () => {
+      // Apply the low-pass filter
+      setRotation(prevRotation => prevRotation * filterAlpha + targetRotation.current * (1 - filterAlpha));
+      animationFrameId = requestAnimationFrame(updateRotation);
+    };
+
+    if (sensorAccess === 'granted') {
+      animationFrameId = requestAnimationFrame(updateRotation);
+    }
+
+    // Cleanup function
     return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
       window.removeEventListener('devicemotion', handleDeviceMotion);
     };
-  }, [handleDeviceMotion]);
+  }, [sensorAccess, handleDeviceMotion]);
 
   const renderContent = () => {
     switch (sensorAccess) {
